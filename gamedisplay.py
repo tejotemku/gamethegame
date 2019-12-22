@@ -59,7 +59,7 @@ class Display:
                         text = self.input_text
                         self.input_text = ''
                         self.draw_input_box()
-                        self.add_info(text)
+                        return text
                     else:
                         if len(self.input_text) <= 120:
                             if len(self.input_text.strip('\n')) % 40 == 0 and len(self.input_text) > 0:
