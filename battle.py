@@ -1,8 +1,9 @@
 from gamedisplay import Display
+from player import Player
 
 
 class Battle:
-    def __init__(self, player, list_of_enemies, display: Display):
+    def __init__(self, player: Player, list_of_enemies, display: Display):
         self.player = player
         self.list_of_enemies = list_of_enemies
         self.rounds = 1
@@ -19,7 +20,7 @@ class Battle:
         list_of_attacks_this_round = self.set_priority_of_attacks(list_of_attacks_this_round)
 
         for attack in list_of_attacks_this_round:
-            print(f'{attack[3]} attack {attack[0].get_name()} for {attack[1]}')
+            self.display.add_info(f'{attack[3]} attack {attack[0].get_name()} for {attack[1]} damage')
             attack[0].take_dmg(attack[1])
 
         for enemy in self.list_of_enemies:
@@ -27,10 +28,14 @@ class Battle:
                 self.list_of_enemies.remove(enemy)
 
         battle_state = self.is_battle_won()
+        # todo battle is won
         self.rounds += 1
 
     def is_battle_won(self):
         return self.rounds
+
+    def get_display(self):
+        return self.display
 
     @staticmethod
     def set_priority_of_attacks(list_of_attacks):
@@ -42,3 +47,5 @@ class Battle:
                     j = 1
 
         return list_of_attacks
+
+# Todo properties

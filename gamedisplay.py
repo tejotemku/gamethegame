@@ -1,4 +1,5 @@
 import pygame
+import time
 
 
 class Display:
@@ -27,7 +28,7 @@ class Display:
         pygame.draw.rect(self.screen, self.box_color, self.info_box)
         text_split = self.info_text.splitlines()
         for i, l in enumerate(text_split):
-            self.screen.blit(self.font.render(l, False, (255, 255, 255)), (15, 20 + i*30))
+            self.screen.blit(self.font.render(l, True, (255, 255, 255)), (15, 20 + i*30))
         pygame.display.update()
 
     def draw_input_box(self):
@@ -35,7 +36,7 @@ class Display:
         pygame.draw.rect(self.screen, self.box_color, self.input_box)
         text_split = self.input_text.splitlines()
         for i, l in enumerate(text_split):
-            self.screen.blit(self.font.render(l, False, (255, 255, 255)), (15, 470 + i*30))
+            self.screen.blit(self.font.render(l, True, (255, 255, 255)), (15, 470 + i*30))
         pygame.display.update()
 
     def add_info(self, text):
@@ -67,3 +68,23 @@ class Display:
                             self.input_text += event.unicode
                 self.draw_input_box()
 
+    def start_a_battle(self):
+        self.info_text = ' '
+        self.add_info('      -------Battle-------')
+
+    def list_enemies(self, list_of_enemies, round_nr):
+        self.add_info(f'   ---{round_nr}---')
+        for i, enemy in enumerate(list_of_enemies):
+            self.add_info(f'{i+1}. {enemy.get_name()} - {enemy.get_hp()}')
+        self.add_info('   ---' + len(str(round_nr))*'-' + '---')
+
+    def invalid_command(self):
+        rect_border = pygame.rect.Rect(300, 250, 200, 100)
+        rect_box = pygame.rect.Rect(305, 255, 190, 90)
+        pygame.draw.rect(self.screen, self.box_border_color, rect_border)
+        pygame.draw.rect(self.screen, self.box_color, rect_box)
+        self.screen.blit(self.font.render('Invalid command', True, (255, 255, 255)), (315, 300))
+        pygame.display.update()
+        time.sleep(1.5)
+        self.draw_info_box()
+        self.draw_input_box()
