@@ -1,11 +1,10 @@
 from gamedisplay import Display
-from player import Player
 from map import Map
 
 
 class Battle:
     def __init__(self, list_of_enemies, display: Display, game_map: Map):
-        self._player: Player = game_map.player
+        self._player = game_map.player
         self._list_of_enemies = list_of_enemies
         self._rounds = 1
         self._display = display
@@ -31,10 +30,10 @@ class Battle:
     def game_map(self):
         return self._map
 
-    def round(self, list_of_targets):
+    def round(self, list_of_targets, players_avatar):
         list_of_attacks_this_round = []
         for target in list_of_targets:
-            list_of_attacks_this_round.append((target, self.player))
+            list_of_attacks_this_round.append((target, players_avatar))
 
         for enemy in self._list_of_enemies:
             list_of_attacks_this_round.append((self.player, enemy))
@@ -57,17 +56,15 @@ class Battle:
         self._rounds += 1
 
     def has_battle_ended(self):
-        return self.player.health_points <= 0 or not self.list_of_enemies
+        return self.player.hp <= 0 or not self.list_of_enemies
 
     def is_battle_won(self):
-        return self.player.health_points
+        return self.player.hp
 
     @staticmethod
-    def set_priority_of_attacks(list_of_attacks):
-        for i in range(0, len(list_of_attacks)):
-            for j in range(i + 1, len(list_of_attacks)):
-                if list_of_attacks[i][1].speed < list_of_attacks[j][1].speed:
-                    list_of_attacks[i], list_of_attacks[j] = list_of_attacks[j], list_of_attacks[i]
-                    i = 0
-                    j = 1
-        return list_of_attacks
+    def set_priority_of_attacks(attacks):
+        for i in range(len(attacks)-1, 0, -1):
+            for j in range(i):
+                if attacks[i][1].speed > attacks[j][1].speed:
+                    attacks[i], attacks[j] = attacks[j], attacks[i]
+        return attacks

@@ -72,34 +72,9 @@ class Map:
             self.game_state = 'explore'
             if self.player().add_exp(exp):
                 self.game_state = 'level up'
+            self.player.add_gold(reward)
+
         else:
             self.game_state = 'game_over'
             self.display.notification_box('Game Over!', 5)
         pass
-
-    def handle_command(self, command: str):
-        if self.game_state == 'explore':
-            pass
-        else:
-            player_class = self.player().get_class()
-            if player_class == 'knight':
-                if 'normal attack' in command:
-                    self.player().normal_attack()
-                elif 'heavy attack' in command:
-                    self.player().heavy_attack()
-                else:
-                    self.display.notification_box('Invalid command', 1.2)
-            if player_class == 'wizard':
-                if 'aoe' in command:
-                    self.player().aoe_attack()
-                elif 'magic' in command:
-                    self.player().magic_attack()
-                else:
-                    self.display.notification_box('Invalid command', 1.2)
-            if player_class == 'rouge':
-                if 'life steal' in command:
-                    self.player().life_stealing_blade_attack()
-                elif 'fast attack' in command:
-                    self.player().fast_attack()
-                else:
-                    self.display.notification_box('Invalid command', 1.2)

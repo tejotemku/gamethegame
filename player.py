@@ -20,8 +20,8 @@ class Player:
         # basic stats
         self._power = power
         self._speed = speed
-        self._health_points = hp
-        self._health_points_max = self._health_points
+        self._hp = hp
+        self._hp_max = self._hp
         # items
         self._list_of_items = []
 
@@ -64,8 +64,9 @@ class Player:
         return self._experience
 
     def add_exp(self, new_exp: int):
-        self._experience += new_exp
-        self.display.add_info(f'You have got new {new_exp} experience!')
+        if new_exp > 0:
+            self._experience += new_exp
+            self.display.add_info(f'You have got new {new_exp} experience!')
         return self.level_up()
 
     @property
@@ -77,7 +78,8 @@ class Player:
         if self.exp >= exp_to_level_up:
             self._lvl += 1
             self._experience -= exp_to_level_up
-            self.display.add_info(f'You have leveled up! You are currently on level {self.level}')
+            self.display.add_info(f'You have leveled up! \nYou are currently on level {self.level}!\
+            \nYou can upgrade one of the following:\npower\nspeed\nhp')
         return self.exp >= exp_to_level_up
 
     @property
@@ -85,8 +87,9 @@ class Player:
         return self._gold
 
     def add_gold(self, gold):
-        self._gold += gold
-        self.display.add_info(f'You have earned {gold} gold!')
+        if gold > 0:
+            self._gold += gold
+            self.display.add_info(f'You have earned {gold} gold!')
 
     def remove_gold(self, gold):
         if self._gold - gold >= 0:
@@ -99,29 +102,33 @@ class Player:
     def power(self):
         return self._power
 
-    def power_increase(self, value):
-        self._power += value
+    def power_increase(self):
+        self._power += 1
 
     @property
     def speed(self):
         return self._speed
 
-    def speed_increase(self, value):
-        self._speed += value
+    def speed_increase(self):
+        self._speed += 1
 
     @property
-    def health_points(self):
-        return self._health_points
+    def hp(self):
+        return self._hp
 
     @property
-    def health_points_max(self):
-        return self._health_points_max
+    def hp_max(self):
+        return self._hp_max
+
+    def hp_increase(self):
+        self._hp += 3
+        self._hp_max += 3
 
     def heal(self, healed_hp_points):
-        self._health_points = min(self.health_points + healed_hp_points, self.health_points_max)
+        self._hp = min(self.hp + healed_hp_points, self.hp_max)
 
     def check_if_alive(self):
-        return self.health_points > 0
+        return self.hp > 0
 
     # items methods
 
@@ -142,18 +149,24 @@ class Knight(Player):
         # heavy armor of a knight reduces damage
         self.dmg_reduction = 2
 
+    def hp_increase(self):
+        self._hp += 5
+        self._hp_max += 5
+
     def normal_attack(self, enemy):
-        self.battle.round(enemy, self.power, self.speed, self.name)
+        self.battle.round(enemy, Player(self.name, 10, self.speed, self.power, 'attack \
+        avatar', self.display))
 
     def heavy_attack(self, enemy: Enemy):
         if random.randint(0, 101) <= 85:
-            self.battle.round(enemy, int(self.power * 1.5), self.speed - 1, self._name)
+            self.battle.round(enemy, Player(self.name, 10, self.speed - 1, int(self.power*1.5), 'attack \
+        avatar', self.display))
         else:
             self.battle.get_display().add_info('You have missed the enemy')
             self.battle.round([], 0, 100, self.name)
 
     def take_dmg(self, dmg: int):
-        self._health_points -= (dmg - self.dmg_reduction)
+        self._hp -= (dmg - self.dmg_reduction)
 
 
 class Wizard(Player):
@@ -166,12 +179,17 @@ class Wizard(Player):
     def magic_barrier(self):
         return self._magic_barrier
 
+    def magic_barrier_increase(self):
+        self._magic_barrier += 1
+
     def aoe_attack(self):
-        self.battle.round(self.battle.list_of_enemies, int(self.power * 0.55), self.speed - 2)
+        self.battle.round(self.battle.list_of_enemies, Player(self.name, 10, self.speed, int(self.power*0.55), 'attack \
+        avatar', self.display))
 
     def magic_attack(self, enemy: Enemy):
         if random.randint(0, 101) <= 90:
-            self.battle.round(enemy, int(self.power * 1.2), self.speed)
+            self.battle.round(enemy, Player(self.name, 10, self.speed, int(self.power*1.2), 'attack \
+        avatar', self.display))
         else:
             self.battle.get_display().add_info('You have missed the enemy')
             self.battle.round([], 0, 100)
@@ -183,7 +201,13 @@ class Wizard(Player):
             if self.magic_barrier <= 0:
                 self.battle.get_display().add_info('Enemy broke your magic shield')
         else:
-            self._health_points -= dmg
+            self._hp -= dmg
+
+    def level_up(self):
+        lvl_up = super()
+        if lvl_up:
+            self.display.add_info('magic barrier')
+        return lvl_up
 
 
 class Rouge(Player):
@@ -196,18 +220,26 @@ class Rouge(Player):
     def agility(self):
         return self._agility
 
-    def agility_increase(self, value):
-        self._agility += value
+    def agility_increase(self):
+        self._agility += 1
+
+    def level_up(self):
+        lvl_up = super()
+        if lvl_up:
+            self.display.add_info('agility')
+        return lvl_up
 
     def life_stealing_blade_attack(self, enemy: Enemy):
-        self.battle.round(enemy, self.power//2, self.speed + self.agility // 10)
+        self.battle.round(enemy, Player(self.name, 10, self.speed + self.agility // 10, self.power//2, 'attack \
+        avatar', self.display))
         self.heal(self.power//4)
 
     def fast_attack(self, enemy: Enemy):
-        self.battle.round(enemy, self.power, self.speed + self.agility//10)
+        self.battle.round(enemy, Player(self.name, 10, self.speed + self.agility // 10, self.power, 'attack \
+        avatar', self.display))
 
     def take_dmg(self, dmg: int):
         if random.randint(0, 101) > self.agility:
-            self._health_points -= dmg
+            self._hp -= dmg
         else:
             self.battle.get_display().add_info(f'You took {dmg} points of damage')
