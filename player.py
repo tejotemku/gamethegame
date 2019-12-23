@@ -27,56 +27,66 @@ class Player:
 
     # basic info methods
 
-    def get_name(self):
+    @property
+    def name(self):
         return self._name
 
-    def get_current_location(self):
+    @property
+    def current_location(self):
         return self._current_location_id
 
-    def move(self, new_location_id: int):
+    @current_location.setter
+    def current_location(self, new_location_id: int):
         self._current_location_id = new_location_id
 
-    def get_class(self):
+    @property
+    def character_class(self):
         return self._class
 
-    def get_battle(self):
+    @property
+    def battle(self):
         return self._battle
 
-    def set_battle(self, battle: Battle):
-        self._battle = battle
-        if self.get_battle():
-            self.get_battle().display.start_a_battle()
+    @battle.setter
+    def battle(self, new_battle: Battle):
+        self._battle = new_battle
+        if self.battle:
+            self.battle.display.start_a_battle()
 
-    def get_display(self):
+    @property
+    def display(self):
         return self._display
 
     # exp, lvl, gold methods
 
-    def get_exp(self):
+    @property
+    def exp(self):
         return self._experience
-
-    def get_level(self):
-        return self._lvl
 
     def add_exp(self, new_exp: int):
         self._experience += new_exp
-        self.get_display().add_info(f'You have got new {new_exp} experience!')
+        self.display.add_info(f'You have got new {new_exp} experience!')
         return self.level_up()
 
+    @property
+    def level(self):
+        return self._lvl
+
     def level_up(self):
-        exp_to_level_up = int(10*pow(1.2, self.get_level()))
-        if self.get_exp() >= exp_to_level_up:
+        exp_to_level_up = int(10*pow(1.2, self.level))
+        if self.exp >= exp_to_level_up:
             self._lvl += 1
             self._experience -= exp_to_level_up
-            self.get_display().add_info(f'You have leveled up! You are currently on level {self.get_level()}')
-        return self.get_exp() >= exp_to_level_up
+            self.display.add_info(f'You have leveled up! You are currently on level {self.level}')
+        return self.exp >= exp_to_level_up
 
-    def get_gold(self):
+    @property
+    def gold(self):
         return self._gold
 
     def add_gold(self, gold):
         self._gold += gold
-        self.get_display().add_info(f'You have earned {gold} gold!')
+        self.display.add_info(f'You have earned {gold} gold!')
 
     def remove_gold(self, gold):
         if self._gold - gold >= 0:
@@ -85,23 +95,33 @@ class Player:
 
     # basic stats methods
 
-    def get_power(self):
+    @property
+    def power(self):
         return self._power
 
-    def get_speed(self):
+    def power_increase(self, value):
+        self._power += value
+
+    @property
+    def speed(self):
         return self._speed
 
-    def get_health_points(self):
+    def speed_increase(self, value):
+        self._speed += value
+
+    @property
+    def health_points(self):
         return self._health_points
 
-    def get_health_points_max(self):
+    @property
+    def health_points_max(self):
         return self._health_points_max
 
     def heal(self, healed_hp_points):
-        self._health_points = min(self.get_health_points() + healed_hp_points, self.get_health_points_max())
+        self._health_points = min(self.health_points + healed_hp_points, self.health_points_max)
 
     def check_if_alive(self):
-        return self.get_health_points() > 0
+        return self.health_points > 0
 
     # items methods
 
@@ -123,14 +143,14 @@ class Knight(Player):
         self.dmg_reduction = 2
 
     def normal_attack(self, enemy):
-        self.get_battle().round(enemy, self.get_power(), self.get_speed(), self.get_name())
+        self.battle.round(enemy, self.power, self.speed, self.name)
 
     def heavy_attack(self, enemy: Enemy):
         if random.randint(0, 101) <= 85:
-            self.get_battle().round(enemy, int(self.get_power() * 1.5), self.get_speed() - 1, self._name)
+            self.battle.round(enemy, int(self.power * 1.5), self.speed - 1, self._name)
         else:
-            self.get_battle().get_display().add_info('You have missed the enemy')
-            self.get_battle().round([], 0, 100, self.get_name())
+            self.battle.get_display().add_info('You have missed the enemy')
+            self.battle.round([], 0, 100, self.name)
 
     def take_dmg(self, dmg: int):
         self._health_points -= (dmg - self.dmg_reduction)
@@ -142,25 +162,26 @@ class Wizard(Player):
         super().__init__(name, 18, 7, 5, 'wizard', display)
         self._magic_barrier = 4
 
-    def get_magic_barrier(self):
+    @property
+    def magic_barrier(self):
         return self._magic_barrier
 
     def aoe_attack(self):
-        self.get_battle().round(self.get_battle().list_of_enemies, int(self.get_power() * 0.55), self.get_speed() - 2)
+        self.battle.round(self.battle.list_of_enemies, int(self.power * 0.55), self.speed - 2)
 
     def magic_attack(self, enemy: Enemy):
         if random.randint(0, 101) <= 90:
-            self.get_battle().round(enemy, int(self.get_power() * 1.2), self.get_speed())
+            self.battle.round(enemy, int(self.power * 1.2), self.speed)
         else:
-            self.get_battle().get_display().add_info('You have missed the enemy')
-            self.get_battle().round([], 0, 100)
+            self.battle.get_display().add_info('You have missed the enemy')
+            self.battle.round([], 0, 100)
 
     def take_dmg(self, dmg: int):
-        if self.get_magic_barrier() > 0:
+        if self.magic_barrier > 0:
             self._magic_barrier -= dmg
-            self.get_battle().get_display().add_info('Your magic barrier has absorbed damage')
-            if self.get_magic_barrier() <= 0:
-                self.get_battle().get_display().add_info('Enemy broke your magic shield')
+            self.battle.get_display().add_info('Your magic barrier has absorbed damage')
+            if self.magic_barrier <= 0:
+                self.battle.get_display().add_info('Enemy broke your magic shield')
         else:
             self._health_points -= dmg
 
@@ -171,18 +192,22 @@ class Rouge(Player):
         super().__init__(name, 20, 7, 11, 'rouge', display)
         self._agility = 20
 
-    def get_agility(self):
+    @property
+    def agility(self):
         return self._agility
 
+    def agility_increase(self, value):
+        self._agility += value
+
     def life_stealing_blade_attack(self, enemy: Enemy):
-        self.get_battle().round(enemy, self.get_power()//2, self.get_speed() + self.get_agility() // 10)
-        self.heal(self.get_power()//4)
+        self.battle.round(enemy, self.power//2, self.speed + self.agility // 10)
+        self.heal(self.power//4)
 
     def fast_attack(self, enemy: Enemy):
-        self.get_battle().round(enemy, self.get_power(), self.get_speed() + self.get_agility()//10)
+        self.battle.round(enemy, self.power, self.speed + self.agility//10)
 
     def take_dmg(self, dmg: int):
-        if random.randint(0, 101) > self.get_agility():
+        if random.randint(0, 101) > self.agility:
             self._health_points -= dmg
         else:
-            self.get_battle().get_display().add_info(f'You took {dmg} points of damage')
+            self.battle.get_display().add_info(f'You took {dmg} points of damage')

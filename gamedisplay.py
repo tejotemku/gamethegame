@@ -18,7 +18,7 @@ class Display:
         # colors and fonts
         self.box_border_color = (249, 242, 236)
         self.box_color = (26, 26, 26)
-        self.font = pygame.font.SysFont('Arial', 25)
+        self.font = pygame.font.SysFont('Arial', 20)
 
         self.draw_info_box()
         self.draw_input_box()
@@ -61,6 +61,7 @@ class Display:
                         self.input_text = ''
                         self.draw_input_box()
                         return text
+                        # self.add_info(text)
                     else:
                         if len(self.input_text) <= 120:
                             if len(self.input_text.strip('\n')) % 40 == 0 and len(self.input_text) > 0:
@@ -78,13 +79,17 @@ class Display:
             self.add_info(f'{i+1}. {enemy.get_name()} - {enemy.get_hp()}')
         self.add_info('   ---' + len(str(round_nr))*'-' + '---')
 
-    def invalid_command(self):
+    def notification_box(self, text, time_length):
         rect_border = pygame.rect.Rect(300, 250, 200, 100)
         rect_box = pygame.rect.Rect(305, 255, 190, 90)
         pygame.draw.rect(self.screen, self.box_border_color, rect_border)
         pygame.draw.rect(self.screen, self.box_color, rect_box)
-        self.screen.blit(self.font.render('Invalid command', True, (255, 255, 255)), (315, 300))
+        self.screen.blit(self.font.render(text, True, (255, 255, 255)), (315, 300))
         pygame.display.update()
-        time.sleep(1.5)
+        time.sleep(time_length)
         self.draw_info_box()
         self.draw_input_box()
+
+
+# display = Display()
+# display.get_input()

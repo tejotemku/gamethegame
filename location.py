@@ -15,28 +15,38 @@ class Location:
         self._name = loc_name
         self._description = loc_description
         self._hidden_items = [hidden_items]
-        self._nearby_locations = [parent_location_id, 'Return']
+        self._nearby_locations = [parent_location_id, 'Go Back']
 
-    def get_id(self):
+    @property
+    def id(self):
         return self._id
 
-    def get_type(self):
+    @property
+    def type(self):
         return self._type
 
-    def get_name(self):
+    @property
+    def name(self):
         return self._name
 
-    def get_description(self):
+    @property
+    def description(self):
         return self._description
 
-    def get_hidden_items(self):
+    @property
+    def hidden_items(self):
         return self._hidden_items
 
-    def get_nearby_locations(self):
+    @hidden_items.setter
+    def hidden_items(self, items):
+        self._hidden_items = items
+
+    @property
+    def nearby_locations(self):
         return self._nearby_locations
 
     def add_nearby_location(self, location_id, direction):
         self._nearby_locations.append((location_id, direction))
 
     def __str__(self):
-        return self.get_description()
+        return self.description
