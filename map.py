@@ -1,4 +1,3 @@
-from player import Player, Rouge, Wizard, Knight
 from location import Location
 from gamedisplay import Display
 from battle import Battle
@@ -9,15 +8,8 @@ class Map:
         self._name = name
         self._player = player
         self._locations = [starting_location]
-        self.game_state = 'explore'
+        self._game_state = 'explore'
         self._display = display
-        self.battle = None
-
-    def get_all_locations(self):
-        return self._locations
-
-    def add_location(self, location: Location):
-        self.get_all_locations().append(location)
 
     def get_name(self):
         return self._name
@@ -25,26 +17,44 @@ class Map:
     def get_player(self):
         return self._player
 
+    def get_all_locations(self):
+        return self._locations
+
+    def add_location(self, location: Location):
+        self.get_all_locations().append(location)
+
+    def get_game_state(self):
+        return self._game_state
+
     def get_display(self):
         return self._display
 
-    def get_game_state(self):
-        return self.game_state
-
-    def get_possible_directions(self):
-        return self._locations[self.get_player().get_current_location()].get_nearby_locations()
+    # movement related methods
 
     def move_to_different_location(self, location_id: int):
+        location = self.get_all_locations()[location_id]
         self.get_player().move(location_id)
-        # TODO make gui for locations
+        self.get_display().add_info(f'You have entered: {location.get_name()}')
+        self.get_display().add_info(location)
+        if location.get_type() not in ['boss', 'dungeon']:
+            self.list_possible_directions()
 
+    def list_possible_directions(self):
+        self.get_display().add_info('From here you can go to: ')
+        for (loc_id, loc_direction) in self.get_player().get_current_location().get_nearby_locations():
+            self.get_display().add_info(f'{self.get_all_locations()[loc_id].get_name()} - {loc_direction}')
+
+    # battle methods
+    
     def start_battle(self, list_of_enemies):
         self._player.set_battle(Battle(self._player, list_of_enemies, self.get_display()))
-        self.game_state = 'battle'
+        self._game_state = 'battle'
 
     def end_battle(self, outcome, exp=0, reward=0, acquired_items=None):
-        self.game_state = 'explore'
-        # todo
+        self._game_state = 'explore'
+        if self.get_player().add_exp(exp):
+            self._game_state = 'level up'
+        # todo end_battle
         pass
 
     def handle_command(self, command: str):
@@ -73,6 +83,3 @@ class Map:
                     self.get_player().fast_attack()
                 else:
                     self.get_display().add_info("Invalid command")
-
-
-# Todo properties
