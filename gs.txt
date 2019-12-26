@@ -1,0 +1,1 @@
+["test save", null, "explore", [0, "town", "Grobla", "P", [["small potion"]], [[1, "Go trakt"], [2, "Go droga"]]], [1, "normal", "Trakt", "Szersza droga", [[]], [[0, "Go Back"]]], [2, "normal", "Droga", "Droga droga", [[]], [[0, "Go Back"]]], [3, "treasure", "Skarb", "Srebra ogrom", [["big potion"]], [[1, "Go Back"]]]]

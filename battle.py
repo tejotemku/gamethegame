@@ -1,9 +1,8 @@
 from gamedisplay import Display
-from map import Map
 
 
 class Battle:
-    def __init__(self, list_of_enemies, display: Display, game_map: Map):
+    def __init__(self, list_of_enemies, display: Display, game_map):
         self._player = game_map.player
         self._list_of_enemies = list_of_enemies
         self._rounds = 1

@@ -9,7 +9,7 @@ class Player:
     def __init__(self, name: str, hp: int, speed: int, power: int, character_class: str, display: Display):
         # basic info
         self._name = name
-        self._current_location_id = None
+        self._current_location_id = 0
         self._class = character_class
         self._battle = None
         self._display = display
@@ -30,6 +30,10 @@ class Player:
     @property
     def name(self):
         return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
 
     @property
     def current_location(self):
@@ -132,14 +136,20 @@ class Player:
 
     # items methods
 
-    def get_list_of_items(self):
-        return self.get_list_of_items()
+    @property
+    def list_of_items(self):
+        return self._list_of_items
 
     def add_new_item(self, item: str):
-        self.get_list_of_items().append(item)
+        self.list_of_items.append(item)
 
     def remove_item(self, item: str):
-        self.get_list_of_items().remove(item)
+        self.list_of_items.remove(item)
+
+    def actions_in_battle(self):
+        for item in ['big potion', 'small potion']:
+            if item in self.list_of_items:
+                self.display.add_info(f'use {item}')
 
 
 class Knight(Player):
@@ -164,6 +174,10 @@ class Knight(Player):
         else:
             self.battle.get_display().add_info('You have missed the enemy')
             self.battle.round([], 0, 100, self.name)
+
+    def actions_in_battle(self):
+        super()
+        self.display.add_info('normal attack\nheavy attack')
 
     def take_dmg(self, dmg: int):
         self._hp -= (dmg - self.dmg_reduction)
@@ -194,6 +208,10 @@ class Wizard(Player):
             self.battle.get_display().add_info('You have missed the enemy')
             self.battle.round([], 0, 100)
 
+    def actions_in_battle(self):
+        super()
+        self.display.add_info('aoe attack\nmagic attack')
+
     def take_dmg(self, dmg: int):
         if self.magic_barrier > 0:
             self._magic_barrier -= dmg
@@ -221,7 +239,7 @@ class Rouge(Player):
         return self._agility
 
     def agility_increase(self):
-        self._agility += 1
+        self._agility += 2
 
     def level_up(self):
         lvl_up = super()
@@ -237,6 +255,10 @@ class Rouge(Player):
     def fast_attack(self, enemy: Enemy):
         self.battle.round(enemy, Player(self.name, 10, self.speed + self.agility // 10, self.power, 'attack \
         avatar', self.display))
+
+    def actions_in_battle(self):
+        super()
+        self.display.add_info('fast attack\nlife stealing attack')
 
     def take_dmg(self, dmg: int):
         if random.randint(0, 101) > self.agility:

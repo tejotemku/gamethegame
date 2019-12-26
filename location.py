@@ -4,10 +4,9 @@ class Location:
 
     Types of locations:
         1: town - merchant and option to save the game
-        2: dungeons - has random enemy encounters
-        3: boss - Battle with powerful enemy
-        4: treasure - Treasure chest that requires a gold key
-        5: vanilla location - No special events
+        2: boss - Battle with powerful enemy
+        3: treasure - Treasure chest that requires a gold key
+        4: normal - No special events
     """
     def __init__(self, loc_id, loc_type, loc_name, loc_description, parent_location_id, hidden_items):
         self._id = loc_id
@@ -15,7 +14,7 @@ class Location:
         self._name = loc_name
         self._description = loc_description
         self._hidden_items = [hidden_items]
-        self._nearby_locations = [parent_location_id, 'Go Back']
+        self._nearby_locations = [(parent_location_id, 'Go Back')]
 
     @property
     def id(self):
