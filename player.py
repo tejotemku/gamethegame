@@ -2,6 +2,7 @@ import random
 from battle import Battle
 from enemy import Enemy
 from gamedisplay import Display
+from shop import Shop
 
 
 class Player:
@@ -16,16 +17,16 @@ class Player:
         # exp and gold
         self._experience = 0
         self._lvl = 1
-        self._gold = 0
+        self._gold = 100
         # basic stats
         self._power = power
         self._speed = speed
         self._hp = hp
         self._hp_max = self._hp
         # items
-        self._list_of_items = []
-
-    # basic info methods
+        self._list_of_items = {}
+        for key in Shop().items.keys():
+            self._list_of_items.update({key: 0})
 
     @property
     def name(self):
@@ -96,9 +97,11 @@ class Player:
             self.display.add_info(f'You have earned {gold} gold!')
 
     def remove_gold(self, gold):
+        enough_gold = False
         if self._gold - gold >= 0:
             self._gold -= gold
-        return self._gold - gold >= 0
+            enough_gold = True
+        return enough_gold
 
     # basic stats methods
 
@@ -141,10 +144,14 @@ class Player:
         return self._list_of_items
 
     def add_new_item(self, item: str):
-        self.list_of_items.append(item)
+        self.list_of_items.update({item: self.list_of_items.get(item) + 1})
 
     def remove_item(self, item: str):
-        self.list_of_items.remove(item)
+        has_item = False
+        if self.list_of_items.get(item) > 0:
+            self.list_of_items.update({item: self.list_of_items.get(item) - 1})
+            has_item = True
+        return has_item
 
     def actions_in_battle(self):
         for item in ['big potion', 'small potion']:

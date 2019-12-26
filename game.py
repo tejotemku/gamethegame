@@ -5,6 +5,7 @@ from gamedisplay import Display
 from map import Map
 from location import Location
 from player import Rouge, Wizard, Knight
+from shop import Shop
 
 
 class Game:
@@ -44,6 +45,11 @@ class Game:
             if self.map:
                 if self.map.game_state == 'explore':
                     self.map.list_possible_directions()
+                if self.map.game_state == 'merchant':
+                    self.list_shopping_items()
+                if self.map.game_state == 'battle':
+                    self.display.list_enemies(self.map.player.battle.list_of_enemies, self.map.player.battle.round)
+
             self.handle_command(self.display.get_input())
 
     def handle_command(self, command: str):
@@ -139,7 +145,7 @@ class Game:
             return True
 
     def exploring_actions(self, command):
-        if 'shop' in command and self.map.player.current_location.type == 'town':
+        if 'shop' in command and self.map.locations[self.map.player.current_location].type == 'town':
             self.map.game_state = 'merchant'
             return True
         if 'small potion' in command:
@@ -164,7 +170,11 @@ class Game:
 
     def battle_actions(self, command):
         player_class = self.map.player.get_class()
-        if player_class == 'knight':
+        if 'item' in command:
+            for item in self.map.player.list_of_items:
+                self.display.add_info(item)
+                return True
+        elif player_class == 'knight':
             if 'normal' in command:
                 self.map.player.normal_attack()
                 return True
@@ -172,7 +182,7 @@ class Game:
                 self.map.player.heavy_attack()
                 return True
 
-        if player_class == 'wizard':
+        elif player_class == 'wizard':
             if 'aoe' in command:
                 self.map.player.aoe_attack()
                 return True
@@ -180,7 +190,7 @@ class Game:
                 self.map.player.magic_attack()
                 return True
 
-        if player_class == 'rouge':
+        elif player_class == 'rouge':
             if 'life steal' in command:
                 self.map.player.life_stealing_blade_attack()
                 return True
@@ -201,27 +211,27 @@ class Game:
         return False
 
     def level_up_actions(self, command):
-        if 'power' in command:
+        if self.compare_commands('power', command):
             self.map.player.power_increase()
             self.map.display.add_info(f'You have increased your power up to {self.map.player.power}')
             self.map.game_state = 'explore'
             return True
-        if 'speed' in command:
+        if self.compare_commands('speed', command):
             self.map.player.speed_increase()
             self.map.display.add_info(f'You have increased your speed up to {self.map.player.speed}')
             self.map.game_state = 'explore'
             return True
-        if 'hp' in command:
+        if self.compare_commands('hp', command):
             self.map.player.hp_increase()
             self.map.display.add_info(f'You have increased your hp up to {self.map.player.hp}')
             self.map.game_state = 'explore'
             return True
-        if 'agility' in command and self.map.player.character_class == 'rouge':
+        if self.compare_commands('agility', command) and self.map.player.character_class == 'rouge':
             self.map.player.agility_increase()
             self.map.display.add_info(f'You have increased your agility up to {self.map.player.agility}')
             self.map.game_state = 'explore'
             return True
-        if 'magic barrier' in command and self.map.player.character_class == 'wizard':
+        if self.compare_commands('magic barrier', command) and self.map.player.character_class == 'wizard':
             self.map.player.magic_barrier_increase()
             self.map.display.add_info(f'You have increased your magic barrier up to {self.map.player.magic_barrier}')
             self.map.game_state = 'explore'
@@ -229,7 +239,26 @@ class Game:
         return False
 
     def shop_actions(self, command):
-        pass
+        items = Shop().items
+        for key in items.keys():
+            if self.compare_commands(key, command):
+                if self.map.player.remove_gold(items.get(key)):
+                    self.map.player.add_new_item(key)
+                    self.display.add_info(f'You have bought {key}')
+                    self.map.game_state = 'explore'
+                    return True
+                else:
+                    self.display.add_info('You don\'t have enough gold')
+
+    def list_shopping_items(self):
+        self.display.add_info('You can buy:')
+        items = Shop().items
+        for key in items.keys():
+            self.display.add_info(f'{key} - {items.get(key)} gold')
+
+    @staticmethod
+    def compare_commands(str1: str, str2: str):
+        return str1.lower() in str2.lower() or str2.lower() in str1.lower()
 
 
 game = Game()
