@@ -1,0 +1,7 @@
+[[[0, "town", "Grobla", "P", [[1, "Go trakt"], [2, "Go droga"]], ["small potion"], []],
+[1, "normal", "Trakt", "Szersza droga", [[0, "Go Back"]], [], ["thief"]],
+[2, "normal", "Droga", "Droga droga", [[0, "Go Back"]], [], []],
+[3, "treasure", "Skarb", "Srebra ogrom", [[1, "Go Back"]], ["big potion"], []]],
+
+["Garry", 18, 18, 7, 5, "wizard", 0, 0, 1, 0, {"small potion": 0, "big potion": 0, "golden key": 0}, 4]
+]

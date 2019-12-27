@@ -2,15 +2,18 @@ class Location:
     """
     This class defines basic properties and methods of a location
     """
-    def __init__(self, loc_id, loc_type, loc_name, loc_description, locations, hidden_items=None, enemies=None):
+    def __init__(self, loc_id, loc_type, loc_name, loc_description, locations, hidden_items=None, enemies=None,
+                 key=None):
         self._id = loc_id
         self._type = loc_type
         self._name = loc_name
         self._description = loc_description
         self._nearby_locations = []
         self._nearby_locations.extend(locations)
-        self._hidden_items = [hidden_items]
+        self._hidden_items = []
+        self._hidden_items.extend(hidden_items)
         self._enemies = enemies
+        self._key = key
 
     @property
     def id(self):
@@ -37,11 +40,9 @@ class Location:
 
     @property
     def hidden_items(self):
-        return self._hidden_items
-
-    @hidden_items.deleter
-    def hidden_items(self):
-        del self._hidden_items
+        items = self._hidden_items
+        self._hidden_items = None
+        return items
 
     @property
     def enemies(self):
@@ -49,7 +50,14 @@ class Location:
 
     @enemies.deleter
     def enemies(self):
-        del self._enemies
+        self._enemies = None
+
+    @property
+    def key(self):
+        return self._key
+
+    def open_location(self):
+        self._key = None
 
     def __str__(self):
         return self.description

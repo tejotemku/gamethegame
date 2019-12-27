@@ -1,11 +1,13 @@
 from gamedisplay import Display
+from enemy import Enemy
 import random
 
 
 class Battle:
     def __init__(self, list_of_enemies, display: Display, game_map):
         self._player = game_map.player
-        self._list_of_enemies = list_of_enemies
+        self._list_of_enemies = []
+        self._list_of_enemies.extend(list_of_enemies)
         self._rounds = 1
         self._display = display
         self._map = game_map
@@ -48,8 +50,11 @@ class Battle:
 
     def round(self, list_of_targets, players_avatar):
         list_of_attacks_this_round = []
-        for target in list_of_targets:
-            list_of_attacks_this_round.append((target, players_avatar))
+        if type(list_of_targets) == Enemy:
+            list_of_attacks_this_round.append((list_of_targets, players_avatar))
+        else:
+            for target in list_of_targets:
+                list_of_attacks_this_round.append((target, players_avatar))
 
         for enemy in self._list_of_enemies:
             list_of_attacks_this_round.append((self.player, enemy))
@@ -63,7 +68,7 @@ class Battle:
                 attack[0].take_dmg(attack[1].power)
 
         for enemy in self.list_of_enemies:
-            if enemy.check_if_alive():
+            if not enemy.check_if_alive():
                 self.add_gold(enemy.rewards[1])
                 self.add_exp(enemy.rewards[0])
                 self.list_of_enemies.remove(enemy)

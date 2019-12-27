@@ -4,20 +4,11 @@ from enemy import enemies
 
 
 class Map:
-    def __init__(self, name: str, locations, player=None):
-        self._name = name
+    def __init__(self, locations, player=None):
         self._player = player
         self._game_state = 'explore'
         self._locations = []
         self._locations.extend(locations)
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, new_name):
-        self._name = new_name
 
     @property
     def player(self):
@@ -57,10 +48,10 @@ class Map:
 
     def list_possible_directions(self):
         self.player.display.add_info('From here you can go: ')
-        if self.locations[self.player.current_location].type == 'town':
-            self.player.display.add_info('-Town Shop-')
         for (loc_id, loc_direction) in self.locations[self.player.current_location].nearby_locations:
             self.player.display.add_info(f'{self.locations[loc_id].name} - {loc_direction}')
+        if self.locations[self.player.current_location].type == 'town':
+            self.player.display.add_info('-Town Shop-')
 
     # battle methods
 
@@ -71,13 +62,14 @@ class Map:
 
     def end_battle(self, outcome, exp=0, reward=0, acquired_items=None):
         if outcome:
+            self.player.display.add_info("----You have won!----")
             self.game_state = 'explore'
-            if self.player.add_exp(exp):
-                self.game_state = 'level up'
             self.player.add_gold(reward)
             for item in acquired_items:
                 self.player.add_new_item(item)
             del self.locations[self.player.current_location].enemies
+            if self.player.add_exp(exp):
+                self.game_state = 'level up'
         else:
             self.game_state = 'game_over'
             self.player.display.notification_box('Game Over!', 5)

@@ -41,7 +41,7 @@ class Display:
 
     def add_info(self, text):
         if len(self.info_text.splitlines()) > 10:
-            self.info_text = '\n'.join(self.info_text.splitlines()[1:])
+            self.info_text = '\n'.join(self.info_text.splitlines()[-14:])
         self.info_text += '\n' + text
         self.draw_info_box()
 

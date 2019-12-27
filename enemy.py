@@ -28,6 +28,9 @@ class Enemy:
     def hp_max(self):
         return self._hp_max
 
+    def take_dmg(self, dmg):
+        self._hp -= dmg
+
     def check_if_alive(self):
         return self.hp > 0
 
