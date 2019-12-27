@@ -28,7 +28,7 @@ class Display:
         pygame.draw.rect(self.screen, self.box_color, self.info_box)
         text_split = self.info_text.splitlines()
         for i, l in enumerate(text_split):
-            self.screen.blit(self.font.render(l, True, (255, 255, 255)), (15, 20 + i*30))
+            self.screen.blit(self.font.render(l, True, (255, 255, 255)), (15, i*30))
         pygame.display.update()
 
     def draw_input_box(self):
@@ -74,9 +74,9 @@ class Display:
         self.add_info('      -------Battle-------')
 
     def list_enemies(self, list_of_enemies, round_nr):
-        self.add_info(f'   ---{round_nr}---')
+        self.add_info(f'   ---Round  {round_nr}---')
         for i, enemy in enumerate(list_of_enemies):
-            self.add_info(f'{i+1}. {enemy.get_name()} - {enemy.get_hp()}')
+            self.add_info(f'{i+1}. {enemy.name} - {enemy.hp}')
         self.add_info('   ---' + len(str(round_nr))*'-' + '---')
 
     def notification_box(self, text, time_length):

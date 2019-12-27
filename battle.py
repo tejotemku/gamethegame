@@ -1,4 +1,5 @@
 from gamedisplay import Display
+import random
 
 
 class Battle:
@@ -8,6 +9,8 @@ class Battle:
         self._rounds = 1
         self._display = display
         self._map = game_map
+        self._reward_gold = 0
+        self._reward_exp = 0
 
     @property
     def player(self):
@@ -29,6 +32,20 @@ class Battle:
     def game_map(self):
         return self._map
 
+    @property
+    def gold(self):
+        return self._reward_gold
+
+    def add_gold(self, value):
+        self._reward_gold += value
+
+    @property
+    def exp(self):
+        return self._reward_exp
+
+    def add_exp(self, value):
+        self._reward_exp += value
+
     def round(self, list_of_targets, players_avatar):
         list_of_attacks_this_round = []
         for target in list_of_targets:
@@ -47,18 +64,25 @@ class Battle:
 
         for enemy in self.list_of_enemies:
             if enemy.check_if_alive():
+                self.add_gold(enemy.rewards[1])
+                self.add_exp(enemy.rewards[0])
                 self.list_of_enemies.remove(enemy)
 
         if self.has_battle_ended():
-            self.game_map.end_battle(self.is_battle_won())
+            items = []
+            ran = random.randint(0, 101)
+            if ran == 1:
+                items.append('golden key')
+            if 10 < ran < 35:
+                items.append('small potion')
+            if 55 < ran < 65:
+                items.append('big potion')
+            self.game_map.end_battle(self.player.check_if_alive(), self.exp, self.gold, items)
 
         self._rounds += 1
 
     def has_battle_ended(self):
         return self.player.hp <= 0 or not self.list_of_enemies
-
-    def is_battle_won(self):
-        return self.player.hp
 
     @staticmethod
     def set_priority_of_attacks(attacks):

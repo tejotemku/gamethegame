@@ -32,7 +32,6 @@ class Game:
 
     def game_loop(self):
         self.display.add_info('Choose game save you want to play:')
-        self.display.add_info(getcwd())
         for (dirpath, dirnames, filenames) in walk(getcwd()):
             for file in filenames:
                 if '.txt' == file[-4:]:
@@ -48,7 +47,7 @@ class Game:
                 if self.map.game_state == 'merchant':
                     self.list_shopping_items()
                 if self.map.game_state == 'battle':
-                    self.display.list_enemies(self.map.player.battle.list_of_enemies, self.map.player.battle.round)
+                    self.display.list_enemies(self.map.player.battle.list_of_enemies, self.map.player.battle.rounds)
 
             self.handle_command(self.display.get_input())
 
@@ -100,31 +99,27 @@ class Game:
 
     @staticmethod
     def map_json_serializer(o: Map):
-        temp_list = [o.name, o.player, o.game_state]
+        temp_list = [o.name, o.player]
+        temp_locations_list = []
         for loc in o.locations:
-            temp_mini_list = [loc.id, loc.type, loc.name, loc.description, loc.hidden_items, loc.nearby_locations]
-            temp_list.append(temp_mini_list)
+            temp_locations_list.append([loc.id,
+                                        loc.type,
+                                        loc.name,
+                                        loc.description,
+                                        loc.nearby_locations,
+                                        loc.hidden_items,
+                                        loc.enemies])
+        temp_list.append(temp_locations_list)
         return json.dumps(temp_list)
 
     @staticmethod
     def map_json_deserializer(file):
         temp_list = json.load(file)
-        temp_locations_attributes_list = temp_list[3:]
-        temp_locations_list = []
-        for loc in temp_locations_attributes_list:
-            temp_loc = Location(loc[0], loc[1], loc[2], loc[3], loc[5][0][0], loc[4])
-            if len(loc[5]) > 1:
-                for n in loc[5][1:]:
-                    temp_loc.add_nearby_location(n[0], n[1])
-            temp_locations_list.append(temp_loc)
-        temp_map = Map(temp_list[0], temp_locations_list[0])
-        if len(temp_locations_list) > 1:
-            for loc in temp_locations_list[1:]:
-                temp_map.add_location(loc)
-        temp_map.player = temp_list[1]
-        temp_map.game_state = temp_list[2]
+        temp_locations = []
+        for loc in temp_list[2]:
+            temp_locations.append(Location(loc[0], loc[1], loc[2], loc[3], loc[4], loc[5], loc[6]))
 
-        return temp_map
+        return Map(temp_list[0], temp_locations, temp_list[1])
 
     def choose_class(self, command):
         if 'knight' in command:
@@ -162,6 +157,7 @@ class Game:
         if 'search' in command:
             for item in self.map.player.current_location.hidden_items:
                 self.map.player.add_new_item(item)
+            del self.map.locations[self.map.player.current_location].hidden_items
         for loc_id, loc_direction in self.map.locations[self.map.player.current_location].nearby_locations:
             if loc_direction in command:
                 self.map.move_to_different_location(loc_id)
@@ -169,7 +165,8 @@ class Game:
         return False
 
     def battle_actions(self, command):
-        player_class = self.map.player.get_class()
+        # todo choose an enemy
+        player_class = self.map.player.character_class
         if 'item' in command:
             for item in self.map.player.list_of_items:
                 self.display.add_info(item)
@@ -189,7 +186,6 @@ class Game:
             elif 'magic' in command:
                 self.map.player.magic_attack()
                 return True
-
         elif player_class == 'rouge':
             if 'life steal' in command:
                 self.map.player.life_stealing_blade_attack()

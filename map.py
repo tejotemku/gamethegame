@@ -1,13 +1,15 @@
 from location import Location
 from battle import Battle
+from enemy import enemies
 
 
 class Map:
-    def __init__(self, name: str, starting_location: Location):
+    def __init__(self, name: str, locations, player=None):
         self._name = name
-        self._player = None
+        self._player = player
         self._game_state = 'explore'
-        self._locations = [starting_location]
+        self._locations = []
+        self._locations.extend(locations)
 
     @property
     def name(self):
@@ -45,11 +47,13 @@ class Map:
     def move_to_different_location(self, location_id: int):
         location = self.locations[location_id]
         self.player.current_location = location_id
-        self.player.player.display.add_info(f'You have entered: {location.name}')
-        self.player.display.add_info(location)
-        if location.type == 'boss':
-            self.list_possible_directions()
-        # todo boss
+        self.player.display.add_info(f'You have entered: {location.name}')
+        self.player.display.add_info(location.description)
+        if location.enemies:
+            enemies_in_location = []
+            for enemy in location.enemies:
+                enemies_in_location.append(enemies.get(enemy))
+            self.start_battle(enemies_in_location)
 
     def list_possible_directions(self):
         self.player.display.add_info('From here you can go: ')
@@ -61,7 +65,7 @@ class Map:
     # battle methods
 
     def start_battle(self, list_of_enemies):
-        self._player.set_battle(Battle(list_of_enemies, self.player.display, self))
+        self._player.battle = Battle(list_of_enemies, self.player.display, self)
         self.game_state = 'battle'
         self.player.display.start_a_battle()
 
@@ -71,7 +75,9 @@ class Map:
             if self.player.add_exp(exp):
                 self.game_state = 'level up'
             self.player.add_gold(reward)
-
+            for item in acquired_items:
+                self.player.add_new_item(item)
+            del self.locations[self.player.current_location].enemies
         else:
             self.game_state = 'game_over'
             self.player.display.notification_box('Game Over!', 5)
