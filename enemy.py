@@ -1,5 +1,17 @@
 class Enemy:
+    """
+    This class represents basic template of an enemy
+    """
     def __init__(self, name: str, power: int, speed: int, hp: int, exp: int, gold: int):
+        """
+        Initializes enemy object
+        :param name: enemy's name
+        :param power: power of enemy's attacks
+        :param speed: speed of enemy's attacks
+        :param hp: enemy's health points
+        :param exp: reward in exp for killing enemy
+        :param gold: reward in gold for killing enemy
+        """
         self._name = name
         self._power = power
         self._speed = speed
@@ -29,9 +41,16 @@ class Enemy:
         return self._hp_max
 
     def take_dmg(self, dmg):
+        """
+        Reduces enemy's health
+        :param dmg: damage that enemy is hit with
+        """
         self._hp -= dmg
 
     def check_if_alive(self):
+        """
+        :return: Checks if Enemy is alive
+        """
         return self.hp > 0
 
     @property

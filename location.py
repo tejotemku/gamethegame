@@ -4,6 +4,17 @@ class Location:
     """
     def __init__(self, loc_id, loc_type, loc_name, loc_description, locations, hidden_items=None, enemies=None,
                  key=None):
+        """
+        This initiates a location object
+        :param loc_id: id number
+        :param loc_type: type of a location town/normal/boss/treasure
+        :param loc_name: name
+        :param loc_description: description
+        :param locations: nearby locations that you can go to
+        :param hidden_items: items hidden in this place
+        :param enemies: enemies that player will encounter in this area
+        :param key: key needed to enter this area
+        """
         self._id = loc_id
         self._type = loc_type
         self._name = loc_name
@@ -36,6 +47,11 @@ class Location:
         return self._nearby_locations
 
     def add_nearby_location(self, location_id, direction):
+        """
+        Adds nearby location where player will be able to go from this location
+        :param location_id: new location id
+        :param direction: How the direction to new location will be called
+        """
         self._nearby_locations.append((location_id, direction))
 
     @property
@@ -56,8 +72,16 @@ class Location:
     def key(self):
         return self._key
 
-    def open_location(self):
-        self._key = None
+    def open_location(self, key):
+        """
+        opens location that required a key if a player has it
+        :param key: key with which there will be attempt to open location
+        :return: if location will be opened
+        """
+        is_open = self.key == key
+        if is_open:
+            self._key = None
+        return is_open
 
     def __str__(self):
         return self.description

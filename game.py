@@ -9,7 +9,13 @@ from shop import Shop
 
 
 class Game:
+    """
+    This class defines a game
+    """
     def __init__(self):
+        """
+        initiates game
+        """
         self._map = None
         self._display = Display()
         self._running = True
@@ -31,6 +37,9 @@ class Game:
         self._running = value
 
     def game_loop(self):
+        """
+        This methods initiates all game mechanics, also listing items while in shop or enemies during battle
+        """
         self.display.add_info('Choose game save you want to play:')
         for (dirpath, dirnames, filenames) in walk(getcwd()):
             for file in filenames:
@@ -44,13 +53,17 @@ class Game:
                     self.running = False
             if self.map:
                 if self.map.game_state == 'merchant':
-                    self.list_shopping_items()
+                    self.display.list_shopping_items()
                 if self.map.game_state == 'battle':
                     self.display.list_enemies(self.map.player.battle.list_of_enemies, self.map.player.battle.rounds)
 
-            self.handle_command(self.display.get_input())
+            self.general_command_handler(self.display.get_input())
 
-    def handle_command(self, command: str):
+    def general_command_handler(self, command: str):
+        """
+        This is general command handler that sends command to more specific handlers depending on game state
+        :param command: inputted command
+        """
         if not self.map:
             self.load_map(command)
         elif self.map.game_state == 'choose class':
@@ -67,9 +80,13 @@ class Game:
         elif self.map.game_state == 'merchant':
             self.shop_actions(command)
 
-    def load_map(self, value):
+    def load_map(self, file_name):
+        """
+        load map from file
+        :param file_name: name of map's txt file
+        """
         try:
-            with open(f'{value}.txt', 'r') as file:
+            with open(f'{file_name}.txt', 'r') as file:
                 self._map = self.map_json_deserializer(file)
             self.display.add_info('Map loaded successfully!')
             if not self.map.player:
@@ -77,9 +94,12 @@ class Game:
                 self.map.game_state = 'choose class'
         except FileNotFoundError:
             self.display.add_info('Map file does not exist! Try again.')
-            return False
 
     def save_game(self, game_save_name):
+        """
+        Saves the game to file
+        :param game_save_name: game's save file's name
+        """
         json_string = self.map_json_serializer(self.map)
         with open(game_save_name + '.txt', 'a') as file:
             file.write(json_string)
@@ -88,6 +108,11 @@ class Game:
 
     @staticmethod
     def map_json_serializer(o: Map):
+        """
+        Serializes map object to json so it can be saved
+        :param o: map object
+        :return:
+        """
         temp_list = []
         p = o.player
         temp_player = [p.name, p.hp_max, p.hp, p.speed, p.power, p.character_class, p.current_location,
@@ -107,6 +132,11 @@ class Game:
         return json.dumps(temp_list)
 
     def map_json_deserializer(self, file):
+        """
+        Deserializes json into map object
+        :param file: file content
+        :return:
+        """
         temp_list = json.load(file)
         temp_locations = []
         for loc in temp_list[0]:
@@ -124,6 +154,10 @@ class Game:
         return Map(temp_locations, player)
 
     def choose_class(self, command):
+        """
+        Command handler when user chooses class for a new player, also asks user for a name
+        :param command: inputted command
+        """
         if self.compare_commands('knight', command):
             self.display.add_info('Choose your name')
             self.map.player = Knight(self.display.get_input(), self.display)
@@ -138,6 +172,10 @@ class Game:
             self.map.game_state = 'explore'
 
     def exploring_actions(self, command):
+        """
+        Command handler during exploring map
+        :param command: inputted command
+        """
         if self.compare_commands('list', command):
             self.map.list_possible_directions()
         elif self.compare_commands('shop', command) and \
@@ -171,6 +209,10 @@ class Game:
                 self.map.move_to_different_location(loc_id)
 
     def battle_actions(self, command):
+        """
+        Command handler during battle
+        :param command: inputted command
+        """
         player_class = self.map.player.character_class
         if self.compare_commands('item', command):
             for item in self.map.player.items:
@@ -205,6 +247,10 @@ class Game:
             self.map.player.battle.round(None, None)
 
     def level_up_actions(self, command):
+        """
+        Command handler when player level ups
+        :param command: inputted command
+        """
         if self.compare_commands('power', command):
             self.map.player.power_increase()
             self.map.player.display.add_info(f'You have increased your power up to {self.map.player.power}')
@@ -228,6 +274,10 @@ class Game:
             self.map.game_state = 'explore'
 
     def shop_actions(self, command):
+        """
+        Command handler during shopping
+        :param command: inputted command
+        """
         items = Shop().items
         for key in items.keys():
             if self.compare_commands(key, command):
@@ -238,18 +288,16 @@ class Game:
                 else:
                     self.display.add_info('You don\'t have enough gold')
 
-    def list_shopping_items(self):
-        self.display.add_info('You can buy:')
-        items = Shop().items
-        for key in items.keys():
-            self.display.add_info(f'{key} - {items.get(key)} gold')
-
     @staticmethod
     def compare_commands(str1: str, str2: str):
+        """
+        :return: compares two strings by checking if one contains the other
+        """
         return str1.lower() in str2.lower() or str2.lower() in str1.lower()
 
 
 game = Game()
 game.game_loop()
 
-# todo help and attributes listing
+# todo help and attributes listing and correct saving file so it replaces previous content
+# todo notification box commands on actions

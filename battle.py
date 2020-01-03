@@ -1,10 +1,20 @@
 from gamedisplay import Display
 from enemy import Enemy
+from map import Map
 import random
 
 
 class Battle:
-    def __init__(self, list_of_enemies, display: Display, game_map):
+    """
+    This class represents an instance of a battle with one or more enemies
+    """
+    def __init__(self, list_of_enemies, display: Display, game_map: Map):
+        """
+        This initiates battle
+        :param list_of_enemies: list of enemies in battle
+        :param display: game screen
+        :param game_map: instance of map
+        """
         self._player = game_map.player
         self._list_of_enemies = []
         self._list_of_enemies.extend(list_of_enemies)
@@ -49,6 +59,11 @@ class Battle:
         self._reward_exp += value
 
     def round(self, list_of_targets, players_avatar):
+        """
+        This method manages attacks during round of a battle
+        :param list_of_targets: list of enemies that player will hit
+        :param players_avatar: new temporary player instance that holds modified power and speed value
+        """
         list_of_attacks_this_round = []
         if type(list_of_targets) == Enemy:
             list_of_attacks_this_round.append((list_of_targets, players_avatar))
@@ -87,10 +102,18 @@ class Battle:
         self._rounds += 1
 
     def has_battle_ended(self):
+        """
+        :return: if battle has already ended or not
+        """
         return self.player.hp <= 0 or not self.list_of_enemies
 
     @staticmethod
     def set_priority_of_attacks(attacks):
+        """
+        Sorts attacks by higher speed
+        :param attacks: list of attacks in current round
+        :return: list of attacks sorted by speed
+        """
         for i in range(len(attacks)-1, 0, -1):
             for j in range(i):
                 if attacks[i][1].speed > attacks[j][1].speed:
