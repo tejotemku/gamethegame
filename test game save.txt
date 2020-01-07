@@ -1,6 +1,6 @@
 [
 [[0, "town", "Grobla", "This town is called Grobla", [[2, "Go to King's road"], [1, "Follow Old road"]], ["small potion"], [], null],
-[1, "normal", "Old road", "This is old road where thieves often set traps", [[0, "Go Back"]], [], ["thief"], null],
+[1, "normal", "Old road", "This is old road where thieves often set traps", [[0, "Go Back"]], [], ["thief", "thief"], null],
 [2, "normal", "King's Road", "King's Road", [[0, "Go Back"], [3, "Enter Cave closed behind the gate"]], ["rusty key"], [], null],
 [3, "treasure", "Cave", "This is cave of an old adventurer, maybe he left something behind", [[2, "Go Back"]], ["big potion"], [], "rusty key"]],
 

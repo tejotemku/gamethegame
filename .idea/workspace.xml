@@ -3,10 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="e032c4c1-af3f-415d-ace9-4b7f98be0c49" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle.py" beforeDir="false" afterPath="$PROJECT_DIR$/battle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/location.py" beforeDir="false" afterPath="$PROJECT_DIR$/location.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/player.py" beforeDir="false" afterPath="$PROJECT_DIR$/player.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test game save.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test game save.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test map template.txt" beforeDir="false" afterPath="$PROJECT_DIR$/test map template.txt" afterDir="false" />
     </list>
