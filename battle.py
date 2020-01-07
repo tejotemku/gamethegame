@@ -1,6 +1,5 @@
 from gamedisplay import Display
 from enemy import Enemy
-from map import Map
 import random
 
 
@@ -8,7 +7,7 @@ class Battle:
     """
     This class represents an instance of a battle with one or more enemies
     """
-    def __init__(self, list_of_enemies, display: Display, game_map: Map):
+    def __init__(self, list_of_enemies, display: Display, game_map):
         """
         This initiates battle
         :param list_of_enemies: list of enemies in battle

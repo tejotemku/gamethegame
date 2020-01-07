@@ -116,7 +116,7 @@ class Game:
         temp_list = []
         p = o.player
         temp_player = [p.name, p.hp_max, p.hp, p.speed, p.power, p.character_class, p.current_location,
-                       p.exp, p.level, p.gold, p.items]
+                       p.exp, p.level, p.gold, p.items, p.keys]
         if p.character_class == 'wizard':
             temp_player.append(p.magic_barrier)
 
@@ -140,16 +140,16 @@ class Game:
         temp_list = json.load(file)
         temp_locations = []
         for loc in temp_list[0]:
-            temp_locations.append(Location(loc[0], loc[1], loc[2], loc[3], loc[4], loc[5], loc[6]))
+            temp_locations.append(Location(loc[0], loc[1], loc[2], loc[3], loc[4], loc[5], loc[6], loc[7]))
         p = temp_list[1]
         player = None
         if p:
             if p[5] == 'knight':
-                player = Knight(p[0], self.display, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10])
+                player = Knight(p[0], self.display, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11])
             if p[5] == 'wizard':
-                player = Wizard(p[0], self.display, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11])
+                player = Wizard(p[0], self.display, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12])
             if p[5] == 'rouge':
-                player = Rouge(p[0], self.display, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11])
+                player = Rouge(p[0], self.display, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12])
 
         return Map(temp_locations, player)
 
@@ -176,7 +176,7 @@ class Game:
         Command handler during exploring map
         :param command: inputted command
         """
-        if self.compare_commands('list', command):
+        if self.compare_commands('look around', command):
             self.map.list_possible_directions()
         elif self.compare_commands('shop', command) and \
                 self.map.locations[self.map.player.current_location].type == 'town':
@@ -194,19 +194,27 @@ class Game:
         elif self.compare_commands('items', command):
             for item in self.map.player.items:
                 self.display.add_info(f'{item} - {self.map.player.items.get(item)}')
+            for key in self.map.player.keys():
+                self.display.add_info(key)
         elif self.compare_commands('search', command):
             items = self.map.locations[self.map.player.current_location].hidden_items
             if items:
                 for item in items:
                     self.map.player.add_new_item(item)
         elif self.compare_commands('help', command):
-            self.display.add_info('Try:\nlist - to list where you can go\nitems - to list items you have\n\
+            self.display.add_info('Try:\nlook around - to list where you can go\nitems - to list items you have\n\
             save - to save the game\nsearch - to search for hidden items')
             if self.map.locations[self.map.player.current_location].type == 'town':
                 self.display.add_info('shop - to buy something')
         for loc_id, loc_direction in self.map.locations[self.map.player.current_location].nearby_locations:
             if self.compare_commands(loc_direction, command):
-                self.map.move_to_different_location(loc_id)
+                if self.map.locations[loc_id].key:
+                    if self.map.player.remove_item(self.map.locations[loc_id].key):
+                        self.map.locations[loc_id].open_location()
+                        self.display.add_info(f"You have opened: {self.map.locations[loc_id].name}")
+                        self.map.move_to_different_location(loc_id)
+                else:
+                    self.map.move_to_different_location(loc_id)
 
     def battle_actions(self, command):
         """
@@ -225,23 +233,33 @@ class Game:
             elif self.compare_commands('heavy', command):
                 self.map.player.heavy_attack(command.split(' ')[-1])
             elif self.compare_commands('help', command):
-                self.display.add_info('Try:\nitems - list items you can use in battle')
+                self.display.add_info('Try:\nitems - list items you can use in battle\n\
+                normal attack <enemy id> - uses normal attack on selected enemy\n\
+                heavy attack <enemy id> - uses heavy attack on selected enemy')
 
         elif player_class == 'wizard':
             if self.compare_commands('aoe', command):
                 self.map.player.aoe_attack()
             elif self.compare_commands('magic', command):
                 self.map.player.magic_attack(command.split(' ')[-1])
+            elif self.compare_commands('help', command):
+                self.display.add_info('Try:\nitems - list items you can use in battle\n\
+                               magic attack <enemy id> - uses magic attack on selected enemy\n\
+                               aoe - attacks all enemies')
         elif player_class == 'rouge':
             if self.compare_commands('life steal', command):
                 self.map.player.life_stealing_blade_attack(command.split(' ')[-1])
             elif self.compare_commands('fast', command):
                 self.map.player.fast_attack(command.split(' ')[-1])
-        if self.compare_commands('small potion', command):
+            elif self.compare_commands('help', command):
+                self.display.add_info('Try:\nitems - list items you can use in battle\n\
+                               life steal <enemy id> - uses attack on selected enemy that steals his hp and heals you\n\
+                               fast attack <enemy id> - uses fast attack on selected enemy')
+        if self.compare_commands('small potion', command) and self.map.player.remove_item('small potion'):
             self.map.player.heal(10)
             self.map.player.display.add_info('You have been healed')
             self.map.player.battle.round(None, None)
-        if self.compare_commands('big potion', command):
+        if self.compare_commands('big potion', command) and self.map.player.remove_item('big potion'):
             self.map.player.heal(25)
             self.map.player.display.add_info('You have been healed')
             self.map.player.battle.round(None, None)

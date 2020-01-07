@@ -72,16 +72,11 @@ class Location:
     def key(self):
         return self._key
 
-    def open_location(self, key):
+    def open_location(self):
         """
-        opens location that required a key if a player has it
-        :param key: key with which there will be attempt to open location
-        :return: if location will be opened
+        opens location
         """
-        is_open = self.key == key
-        if is_open:
-            self._key = None
-        return is_open
+        self._key = None
 
     def __str__(self):
         return self.description

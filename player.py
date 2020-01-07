@@ -1,6 +1,5 @@
 import random
 from battle import Battle
-from enemy import Enemy
 from gamedisplay import Display
 from shop import Shop
 
@@ -10,7 +9,7 @@ class Player:
     This is a class of a player
     """
     def __init__(self, name: str, hp_max: int, hp: int, speed: int, power: int, character_class: str, display: Display,
-                 current_location_id: int = 0, exp: int = 0, lvl: int = 0, gold: int = 0, items=None):
+                 current_location_id: int = 0, exp: int = 0, lvl: int = 0, gold: int = 0, items=None, keys=None):
         """
         This method initiates a player object
         """
@@ -31,6 +30,9 @@ class Player:
         self._hp_max = hp_max
         # items
         self._list_of_items = {}
+        self._keys = []
+        if keys:
+            self._keys.extend(keys)
         for key in Shop().items.keys():
             self._list_of_items.update({key: 0})
         if items:
@@ -65,7 +67,7 @@ class Player:
     def battle(self, new_battle: Battle):
         self._battle = new_battle
         if self.battle:
-            self.battle.display.start_a_battle()
+            self.battle.display.start_a_battle_string()
 
     @property
     def display(self):
@@ -183,15 +185,25 @@ class Player:
         :param item:
         :return:
         """
-        self.items.update({item: self.items.get(item) + 1})
+        if self.items.keys().__contains__(item):
+            self.items.update({item: self.items.get(item) + 1})
+        else:
+            self._keys.append(item)
         self.display.add_info(f'You have got new item, {item}!')
 
     def remove_item(self, item: str):
         has_item = False
-        if self.items.get(item) > 0:
-            self.items.update({item: self.items.get(item) - 1})
+        if self.items.__contains__(item):
+            if self.items.get(item) > 0:
+                self.items.update({item: self.items.get(item) - 1})
+            has_item = True
+        elif self.keys().__contains__(item):
+            self.keys().remove(item)
             has_item = True
         return has_item
+
+    def keys(self):
+        return self._keys
 
 
 class Knight(Player):
@@ -201,11 +213,12 @@ class Knight(Player):
 
     def __init__(self, name: str, display: Display, hp_max: int = 40, hp: int = 40, speed: int = 5, power: int = 8,
                  ch_class: str = 'knight', current_location_id: int = 0, exp: int = 0, lvl: int = 1,
-                 gold: int = 0, items=None):
+                 gold: int = 0, items=None, keys=None):
         """
         This method creates object of Knight
         """
-        super().__init__(name, hp_max, hp, speed, power, ch_class, display, current_location_id, exp, lvl, gold, items)
+        super().__init__(name, hp_max, hp, speed, power, ch_class, display, current_location_id, exp, lvl, gold, items,
+                         keys)
         # heavy armor of a knight reduces damage
         self.dmg_reduction = 2
 
@@ -249,8 +262,9 @@ class Wizard(Player):
     """
     def __init__(self, name: str, display: Display, hp_max: int = 18, hp: int = 18, speed: int = 7, power: int = 5,
                  ch_class: str = 'wizard', current_location_id: int = 0, exp: int = 0, lvl: int = 1,
-                 gold: int = 0, items=None, magic_barrier: int = 4):
-        super().__init__(name, hp_max, hp, speed, power, ch_class, display, current_location_id, exp, lvl, gold, items)
+                 gold: int = 0, items=None, keys=None, magic_barrier: int = 4):
+        super().__init__(name, hp_max, hp, speed, power, ch_class, display, current_location_id, exp, lvl, gold, items,
+                         keys)
         self._magic_barrier = magic_barrier
 
     @property
@@ -311,8 +325,9 @@ class Rouge(Player):
     """
     def __init__(self, name: str, display: Display, hp_max: int = 20, hp: int = 20, speed: int = 7, power: int = 11,
                  ch_class: str = 'rouge', current_location_id: int = 0, exp: int = 0, lvl: int = 1,
-                 gold: int = 0, items=None, agility: int = 20):
-        super().__init__(name, hp_max, hp, speed, power, ch_class, display, current_location_id, exp, lvl, gold, items)
+                 gold: int = 0, items=None, keys=None, agility: int = 20):
+        super().__init__(name, hp_max, hp, speed, power, ch_class, display, current_location_id, exp, lvl, gold, items,
+                         keys)
         self._agility = agility
 
     @property
