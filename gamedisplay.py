@@ -71,7 +71,7 @@ class Display:
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    return 'quit'
                 if event.type is pygame.KEYDOWN:
                     if event.key == pygame.K_BACKSPACE:
                         if len(self.input_text.strip('\n')) % 40 == 0:
@@ -82,7 +82,6 @@ class Display:
                         self.input_text = ''
                         self.draw_input_box()
                         return text
-                        # self.add_info(text)
                     else:
                         if len(self.input_text) <= 120:
                             if len(self.input_text.strip('\n')) % 40 == 0 and len(self.input_text) > 0:

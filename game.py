@@ -47,7 +47,6 @@ class Game:
                     self.display.add_info(file[:-4])
             break
         while self.running:
-            self.display.add_info(' ')
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -56,15 +55,16 @@ class Game:
                     self.display.list_shopping_items()
                 if self.map.game_state == 'battle':
                     self.display.list_enemies(self.map.player.battle.list_of_enemies, self.map.player.battle.rounds)
-
             self.general_command_handler(self.display.get_input())
 
-    def general_command_handler(self, command: str):
+    def general_command_handler(self, command):
         """
         This is general command handler that sends command to more specific handlers depending on game state
         :param command: inputted command
         """
-        if not self.map:
+        if command == 'quit':
+            self.running = False
+        elif not self.map:
             self.load_map(command)
         elif self.map.game_state == 'choose class':
             self.choose_class(command)
@@ -203,7 +203,7 @@ class Game:
                     self.map.player.add_new_item(item)
         elif self.compare_commands('help', command):
             self.display.add_info('Try:\nlook around - to list where you can go\nitems - to list items you have\n\
-            save - to save the game\nsearch - to search for hidden items')
+            save - to save the game\nsearch - to search for hidden items\nquit - quits game')
             if self.map.locations[self.map.player.current_location].type == 'town':
                 self.display.add_info('shop - to buy something')
         for loc_id, loc_direction in self.map.locations[self.map.player.current_location].nearby_locations:
@@ -235,7 +235,7 @@ class Game:
             elif self.compare_commands('help', command):
                 self.display.add_info('Try:\nitems - list items you can use in battle\n\
                 normal attack <enemy id> - uses normal attack on selected enemy\n\
-                heavy attack <enemy id> - uses heavy attack on selected enemy')
+                heavy attack <enemy id> - uses heavy attack on selected enemy\nquit - quits game')
 
         elif player_class == 'wizard':
             if self.compare_commands('aoe', command):
@@ -245,7 +245,7 @@ class Game:
             elif self.compare_commands('help', command):
                 self.display.add_info('Try:\nitems - list items you can use in battle\n\
                                magic attack <enemy id> - uses magic attack on selected enemy\n\
-                               aoe - attacks all enemies')
+                               aoe - attacks all enemies\nquit - quits game')
         elif player_class == 'rouge':
             if self.compare_commands('life steal', command):
                 self.map.player.life_stealing_blade_attack(command.split(' ')[-1])
@@ -254,7 +254,7 @@ class Game:
             elif self.compare_commands('help', command):
                 self.display.add_info('Try:\nitems - list items you can use in battle\n\
                                life steal <enemy id> - uses attack on selected enemy that steals his hp and heals you\n\
-                               fast attack <enemy id> - uses fast attack on selected enemy')
+                               fast attack <enemy id> - uses fast attack on selected enemy\nquit - quits game')
         if self.compare_commands('small potion', command) and self.map.player.remove_item('small potion'):
             self.map.player.heal(10)
             self.map.player.display.add_info('You have been healed')
