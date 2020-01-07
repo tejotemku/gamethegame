@@ -101,7 +101,7 @@ class Game:
         :param game_save_name: game's save file's name
         """
         json_string = self.map_json_serializer(self.map)
-        with open(game_save_name + '.txt', 'a') as file:
+        with open(game_save_name + '.txt', 'w') as file:
             file.write(json_string)
         self.display.add_info('Game saved successfully!')
         file.close()
@@ -194,7 +194,7 @@ class Game:
         elif self.compare_commands('items', command):
             for item in self.map.player.items:
                 self.display.add_info(f'{item} - {self.map.player.items.get(item)}')
-            for key in self.map.player.keys():
+            for key in self.map.player.keys:
                 self.display.add_info(key)
         elif self.compare_commands('search', command):
             items = self.map.locations[self.map.player.current_location].hidden_items

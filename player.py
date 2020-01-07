@@ -197,11 +197,12 @@ class Player:
             if self.items.get(item) > 0:
                 self.items.update({item: self.items.get(item) - 1})
             has_item = True
-        elif self.keys().__contains__(item):
-            self.keys().remove(item)
+        elif self.keys.__contains__(item):
+            self.keys.remove(item)
             has_item = True
         return has_item
 
+    @property
     def keys(self):
         return self._keys
 

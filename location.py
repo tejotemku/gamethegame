@@ -20,9 +20,11 @@ class Location:
         self._name = loc_name
         self._description = loc_description
         self._nearby_locations = []
-        self._nearby_locations.extend(locations)
+        if locations:
+            self._nearby_locations.extend(locations)
         self._hidden_items = []
-        self._hidden_items.extend(hidden_items)
+        if hidden_items:
+            self._hidden_items.extend(hidden_items)
         self._enemies = enemies
         self._key = key
 
