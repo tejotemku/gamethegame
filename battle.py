@@ -1,4 +1,3 @@
-from gamedisplay import Display
 from enemy import Enemy
 import random
 
@@ -7,7 +6,7 @@ class Battle:
     """
     This class represents an instance of a battle with one or more enemies
     """
-    def __init__(self, list_of_enemies, display: Display, game_map):
+    def __init__(self, list_of_enemies, game_map):
         """
         This initiates battle
         :param list_of_enemies: list of enemies in battle
@@ -18,7 +17,6 @@ class Battle:
         self._list_of_enemies = []
         self._list_of_enemies.extend(list_of_enemies)
         self._rounds = 1
-        self._display = display
         self._map = game_map
         self._reward_gold = 0
         self._reward_exp = 0
@@ -34,10 +32,6 @@ class Battle:
     @property
     def rounds(self):
         return self._rounds
-
-    @property
-    def display(self):
-        return self._display
 
     @property
     def game_map(self):
@@ -77,7 +71,7 @@ class Battle:
 
         for attack in list_of_attacks_this_round:
             if attack[0].check_if_alive() and attack[1].check_if_alive():
-                self._display.add_info(f'{attack[1].name} attack {attack[0].name} for \
+                print(f'{attack[1].name} attack {attack[0].name} for \
 {attack[1].power} damage')
                 attack[0].take_dmg(attack[1].power)
 

@@ -1,7 +1,6 @@
 import json
 import pygame
 from os import walk, getcwd
-from gamedisplay import Display
 from map import Map
 from location import Location
 from player import Rouge, Wizard, Knight
@@ -17,16 +16,11 @@ class Game:
         initiates game
         """
         self._map = None
-        self._display = Display()
         self._running = True
 
     @property
     def map(self):
         return self._map
-
-    @property
-    def display(self):
-        return self._display
 
     @property
     def running(self):
@@ -40,22 +34,17 @@ class Game:
         """
         This methods initiates all game mechanics, also listing items while in shop or enemies during battle
         """
-        self.display.add_info('Choose game save you want to play:')
+        print('Choose game save you want to play:')
         for (dirpath, dirnames, filenames) in walk(getcwd()):
             for file in filenames:
                 if '.txt' == file[-4:]:
-                    self.display.add_info(file[:-4])
+                    print(file[:-4])
             break
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-            if self.map:
-                if self.map.game_state == 'merchant':
-                    self.display.list_shopping_items()
-                if self.map.game_state == 'battle':
-                    self.display.list_enemies(self.map.player.battle.list_of_enemies, self.map.player.battle.rounds)
-            self.general_command_handler(self.display.get_input())
+            self.general_command_handler(str(input()))
 
     def general_command_handler(self, command):
         """
@@ -88,12 +77,12 @@ class Game:
         try:
             with open(f'{file_name}.txt', 'r') as file:
                 self._map = self.map_json_deserializer(file)
-            self.display.add_info('Map loaded successfully!')
+            print('Map loaded successfully!')
             if not self.map.player:
-                self.display.add_info('Choose your class: rouge, knight or wizard')
+                print('Choose your class: rouge, knight or wizard')
                 self.map.game_state = 'choose class'
         except FileNotFoundError:
-            self.display.add_info('Map file does not exist! Try again.')
+            print('Map file does not exist! Try again.')
 
     def save_game(self, game_save_name):
         """
@@ -103,7 +92,7 @@ class Game:
         json_string = self.map_json_serializer(self.map)
         with open(game_save_name + '.txt', 'w') as file:
             file.write(json_string)
-        self.display.add_info('Game saved successfully!')
+        print('Game saved successfully!')
         file.close()
 
     @staticmethod
@@ -131,7 +120,8 @@ class Game:
         temp_list.append(temp_player)
         return json.dumps(temp_list)
 
-    def map_json_deserializer(self, file):
+    @staticmethod
+    def map_json_deserializer(file):
         """
         Deserializes json into map object
         :param file: file content
@@ -145,11 +135,11 @@ class Game:
         player = None
         if p:
             if p[5] == 'knight':
-                player = Knight(p[0], self.display, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11])
+                player = Knight(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11])
             if p[5] == 'wizard':
-                player = Wizard(p[0], self.display, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12])
+                player = Wizard(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12])
             if p[5] == 'rouge':
-                player = Rouge(p[0], self.display, p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12])
+                player = Rouge(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10], p[11], p[12])
 
         return Map(temp_locations, player)
 
@@ -158,18 +148,18 @@ class Game:
         Command handler when user chooses class for a new player, also asks user for a name
         :param command: inputted command
         """
-        if self.compare_commands('knight', command):
-            self.display.add_info('Choose your name')
-            self.map.player = Knight(self.display.get_input(), self.display)
-            self.map.game_state = 'explore'
-        if self.compare_commands('wizard', command):
-            self.display.add_info('Choose your name')
-            self.map.player = Wizard(self.display.get_input(), self.display)
-            self.map.game_state = 'explore'
-        if self.compare_commands('rouge', command):
-            self.display.add_info('Choose your name')
-            self.map.player = Rouge(self.display.get_input(), self.display)
-            self.map.game_state = 'explore'
+        classes = {
+            'knight': Knight,
+            'wizard': Wizard,
+            'rouge': Rouge
+        }
+
+        for c in classes:
+            if self.compare_commands(c, command):
+                print('Choose your name')
+                self.map.player = classes.get(c)(str(input()))
+                self.map.game_state = 'explore'
+                return
 
     def exploring_actions(self, command):
         """
@@ -184,7 +174,7 @@ class Game:
         elif self.compare_commands('save', command) and \
                 self.map.locations[self.map.player.current_location].type == 'town':
             self.map.game_state = 'saving'
-            self.display.add_info('Type the name of the save')
+            print('Type the name of the save')
         elif self.compare_commands('small potion', command):
             self.map.player.heal(10)
             self.map.player.display.add_info('You have been healed')
@@ -193,25 +183,25 @@ class Game:
             self.map.player.display.add_info('You have been healed')
         elif self.compare_commands('items', command):
             for item in self.map.player.items:
-                self.display.add_info(f'{item} - {self.map.player.items.get(item)}')
+                print(f'{item} - {self.map.player.items.get(item)}')
             for key in self.map.player.keys:
-                self.display.add_info(key)
+                print(key)
         elif self.compare_commands('search', command):
             items = self.map.locations[self.map.player.current_location].hidden_items
             if items:
                 for item in items:
                     self.map.player.add_new_item(item)
         elif self.compare_commands('help', command):
-            self.display.add_info('Try:\nlook around - to list where you can go\nitems - to list items you have\n\
+            print('Try:\nlook around - to list where you can go\nitems - to list items you have\n\
             save - to save the game\nsearch - to search for hidden items\nquit - quits game')
             if self.map.locations[self.map.player.current_location].type == 'town':
-                self.display.add_info('shop - to buy something')
+                print('shop - to buy something')
         for loc_id, loc_direction in self.map.locations[self.map.player.current_location].nearby_locations:
             if self.compare_commands(loc_direction, command):
                 if self.map.locations[loc_id].key:
                     if self.map.player.remove_item(self.map.locations[loc_id].key):
                         self.map.locations[loc_id].open_location()
-                        self.display.add_info(f"You have opened: {self.map.locations[loc_id].name}")
+                        print(f"You have opened: {self.map.locations[loc_id].name}")
                         self.map.move_to_different_location(loc_id)
                 else:
                     self.map.move_to_different_location(loc_id)
@@ -225,7 +215,7 @@ class Game:
         if self.compare_commands('item', command):
             for item in self.map.player.items:
                 if item != 'golden key':
-                    self.display.add_info(item)
+                    print(item)
 
         elif player_class == 'knight':
             if self.compare_commands('normal', command):
@@ -233,7 +223,7 @@ class Game:
             elif self.compare_commands('heavy', command):
                 self.map.player.heavy_attack(command.split(' ')[-1])
             elif self.compare_commands('help', command):
-                self.display.add_info('Try:\nitems - list items you can use in battle\n\
+                print('Try:\nitems - list items you can use in battle\n\
                 normal attack <enemy id> - uses normal attack on selected enemy\n\
                 heavy attack <enemy id> - uses heavy attack on selected enemy\nquit - quits game')
 
@@ -243,7 +233,7 @@ class Game:
             elif self.compare_commands('magic', command):
                 self.map.player.magic_attack(command.split(' ')[-1])
             elif self.compare_commands('help', command):
-                self.display.add_info('Try:\nitems - list items you can use in battle\n\
+                print('Try:\nitems - list items you can use in battle\n\
                                magic attack <enemy id> - uses magic attack on selected enemy\n\
                                aoe - attacks all enemies\nquit - quits game')
         elif player_class == 'rouge':
@@ -252,7 +242,7 @@ class Game:
             elif self.compare_commands('fast', command):
                 self.map.player.fast_attack(command.split(' ')[-1])
             elif self.compare_commands('help', command):
-                self.display.add_info('Try:\nitems - list items you can use in battle\n\
+                print('Try:\nitems - list items you can use in battle\n\
                                life steal <enemy id> - uses attack on selected enemy that steals his hp and heals you\n\
                                fast attack <enemy id> - uses fast attack on selected enemy\nquit - quits game')
         if self.compare_commands('small potion', command) and self.map.player.remove_item('small potion'):
@@ -301,10 +291,10 @@ class Game:
             if self.compare_commands(key, command):
                 if self.map.player.remove_gold(items.get(key)):
                     self.map.player.add_new_item(key)
-                    self.display.add_info(f'You have bought {key}')
+                    print(f'You have bought {key}')
                     self.map.game_state = 'explore'
                 else:
-                    self.display.add_info('You don\'t have enough gold')
+                    print('You don\'t have enough gold')
 
     @staticmethod
     def compare_commands(str1: str, str2: str):

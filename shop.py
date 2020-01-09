@@ -6,8 +6,14 @@ class Shop:
         """
         This method initiates a shop object
         """
-        self._items = {'small potion': 15, 'big potion': 35, 'golden key': 75}
+        self._items = {'small potion': 15, 'big potion': 35}
 
     @property
     def items(self):
         return self._items
+
+    def __str__(self):
+        string = ""
+        for i in self.items:
+            string += f'{i}: {self.items.get(i)}\n'
+        return string[:-2]
