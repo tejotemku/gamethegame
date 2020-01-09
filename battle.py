@@ -10,7 +10,6 @@ class Battle:
         """
         This initiates battle
         :param list_of_enemies: list of enemies in battle
-        :param display: game screen
         :param game_map: instance of map
         """
         self._player = game_map.player
@@ -51,6 +50,15 @@ class Battle:
     def add_exp(self, value):
         self._reward_exp += value
 
+    def start(self):
+        print('-------Battle starts!-------')
+        print(f'Round: {self.rounds}')
+        self.list_enemies()
+
+    def list_enemies(self):
+        for i, enemy in enumerate(self.list_of_enemies):
+            print(f'{i}: {enemy.name} - {enemy.hp} hp')
+
     def round(self, list_of_targets, players_avatar):
         """
         This method manages attacks during round of a battle
@@ -58,6 +66,7 @@ class Battle:
         :param players_avatar: new temporary player instance that holds modified power and speed value
         """
         list_of_attacks_this_round = []
+
         if type(list_of_targets) == Enemy:
             list_of_attacks_this_round.append((list_of_targets, players_avatar))
         else:
@@ -71,8 +80,7 @@ class Battle:
 
         for attack in list_of_attacks_this_round:
             if attack[0].check_if_alive() and attack[1].check_if_alive():
-                print(f'{attack[1].name} attack {attack[0].name} for \
-{attack[1].power} damage')
+                print(f'{attack[1].name} attack {attack[0].name} for {attack[1].power} damage')
                 attack[0].take_dmg(attack[1].power)
 
         for enemy in self.list_of_enemies:
@@ -91,7 +99,8 @@ class Battle:
             if 55 < ran < 65:
                 items.append('big potion')
             self.game_map.end_battle(self.player.check_if_alive(), self.exp, self.gold, items)
-
+        else:
+            self.list_enemies()
         self._rounds += 1
 
     def has_battle_ended(self):

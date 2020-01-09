@@ -8,13 +8,12 @@ class Player:
     This is a class of a player
     """
     def __init__(self, name: str, hp_max: int, hp: int, speed: int, power: int, character_class: str,
-                 current_location_id: int = 0, exp: int = 0, lvl: int = 0, gold: int = 0, items=None, keys=None):
+                 exp: int = 0, lvl: int = 0, gold: int = 0, items=None, keys=None):
         """
         This method initiates a player object
         """
         # basic info
         self._name = name
-        self._current_location_id = current_location_id
         self._class = character_class
         self._battle = None
         # exp and gold
@@ -47,14 +46,6 @@ class Player:
         self._name = value
 
     @property
-    def current_location(self):
-        return self._current_location_id
-
-    @current_location.setter
-    def current_location(self, new_location_id: int):
-        self._current_location_id = new_location_id
-
-    @property
     def character_class(self):
         return self._class
 
@@ -65,10 +56,9 @@ class Player:
     @battle.setter
     def battle(self, new_battle: Battle):
         self._battle = new_battle
-        if self.battle:
-            self.battle.display.start_a_battle_string()
+        self.battle.start()
 
-    # exp, lvl, gold methods
+    # exp, lvl
 
     @property
     def exp(self):
@@ -82,6 +72,9 @@ class Player:
             self._experience += new_exp
             print(f'You have got new {new_exp} experience!')
         return self.level_up()
+
+    def get_level(self):
+        print(f'Level: {self.level}\nExp: {self.exp}\nYou need {int(10*pow(1.2, self.level))-self.exp} exp to level up')
 
     @property
     def level(self):
@@ -100,6 +93,11 @@ class Player:
             print(f'You have leveled up! \nYou are currently on level {self.level}!\
             \nYou can upgrade one of the following:\npower\nspeed\nhp')
         return lvl_up
+
+    # gold methods
+
+    def get_gold(self):
+        print(f'{self.gold} gold')
 
     @property
     def gold(self):
@@ -132,7 +130,7 @@ class Player:
         """
         :return: player's current stats
         """
-        return f'power: {self.power}\nspeed: {self.speed}\nhp: {self.hp}\nhp max: {self.hp_max}'
+        print(f'power: {self.power}\nspeed: {self.speed}\nhp: {self.hp}\nhp max: {self.hp_max}')
 
     @property
     def power(self):
@@ -166,7 +164,9 @@ class Player:
         :param healed_hp_points:
         :return:
         """
+        hp = self.hp
         self._hp = min(self.hp + healed_hp_points, self.hp_max)
+        print(f'You have been healed by {self.hp - hp} hp points')
 
     def check_if_alive(self):
         """
@@ -174,13 +174,23 @@ class Player:
         """
         return self.hp > 0
 
-    # items methods
+    # keys&items methods
     def get_items(self):
-        for
+        string = ''
+        for i in self.items:
+            string += f'i: {self.items.get(i)}\n'
+        for k in self.keys:
+            string += f'{k}\n'
+        print(string[:-2])
 
     @property
     def items(self):
         return self._list_of_items
+
+    def new_items(self, items):
+        if items:
+            for item in items:
+                self.add_new_item(item)
 
     def add_new_item(self, item: str):
         """
@@ -200,14 +210,40 @@ class Player:
             if self.items.get(item) > 0:
                 self.items.update({item: self.items.get(item) - 1})
             has_item = True
+            print(f'Used {item}')
         elif self.keys.__contains__(item):
             self.keys.remove(item)
             has_item = True
+            print(f'Used {item}')
         return has_item
 
     @property
     def keys(self):
         return self._keys
+
+    def basic_commands(self):
+        commands = {
+            'stats': self.get_stats(),
+            'gold': self.get_gold(),
+            'items': self.get_items(),
+            'level': self.get_level(),
+            'help': self.help_command()
+        }
+
+        if self.items.get('small potion') > 0:
+            commands.update({'small potion': [self.heal(10),
+                            self.remove_item('small potion')]})
+
+        if self.items.get('big potion') > 0:
+            commands.update({'big potion': [self.heal(10),
+                            self.remove_item('big potion')]})
+        return commands
+
+    @staticmethod
+    def help_command():
+        print('stats - to check your attributes\ngold - to check your gold\nitems - check your items\n\
+        level - check your level and exp\nsmall potion - to use potion if you have it\n\
+        big potion - to use potion if you have it\n')
 
 
 class Knight(Player):
@@ -216,12 +252,12 @@ class Knight(Player):
     """
 
     def __init__(self, name: str, hp_max: int = 40, hp: int = 40, speed: int = 5, power: int = 8,
-                 ch_class: str = 'knight', current_location_id: int = 0, exp: int = 0, lvl: int = 1,
+                 ch_class: str = 'knight', exp: int = 0, lvl: int = 1,
                  gold: int = 0, items=None, keys=None):
         """
         This method creates object of Knight
         """
-        super().__init__(name, hp_max, hp, speed, power, ch_class, current_location_id, exp, lvl, gold, items,
+        super().__init__(name, hp_max, hp, speed, power, ch_class, exp, lvl, gold, items,
                          keys)
         # heavy armor of a knight reduces damage
         self.dmg_reduction = 2
@@ -234,7 +270,7 @@ class Knight(Player):
         """
         :return: player's current stats
         """
-        return super().get_stats() + f'\ndmg reduction: {self.dmg_reduction}'
+        print(super().get_stats() + f'\ndmg reduction: {self.dmg_reduction}')
 
     def normal_attack(self, enemy_id):
         """
@@ -253,7 +289,7 @@ class Knight(Player):
             self.battle.round(self.battle.list_of_enemies[int(enemy_id) - 1],
                               Player(self.name, 10, 10, self.speed - 1, int(self.power*1.5), 'attack avatar'))
         else:
-            self.battle.display.add_info('You have missed the enemy')
+            print('You have missed the enemy')
             self.battle.round([], Player(self.name, 10, 10, self.speed, int(self.power*1.2), 'attack avatar'))
 
     def take_dmg(self, dmg: int):
@@ -264,15 +300,20 @@ class Knight(Player):
         print(f'Your heavy armor reduces {self.dmg_reduction} points of dmg')
         self._hp -= (dmg - self.dmg_reduction)
 
+    @staticmethod
+    def battle_help_command():
+        print('normal attack <enemy id>- attacks chosen enemy with basic attack\n\
+        heavy attack - attacks chosen enemy with powerful heavy attack, but with lower speed and small chance to miss')
+
 
 class Wizard(Player):
     """
     This is a subclass of a player that is a class of player's character class Knight
     """
     def __init__(self, name: str, hp_max: int = 18, hp: int = 18, speed: int = 7, power: int = 5,
-                 ch_class: str = 'wizard', current_location_id: int = 0, exp: int = 0, lvl: int = 1,
+                 ch_class: str = 'wizard', exp: int = 0, lvl: int = 1,
                  gold: int = 0, items=None, keys=None, magic_barrier: int = 4):
-        super().__init__(name, hp_max, hp, speed, power, ch_class, current_location_id, exp, lvl, gold, items,
+        super().__init__(name, hp_max, hp, speed, power, ch_class, exp, lvl, gold, items,
                          keys)
         self._magic_barrier = magic_barrier
 
@@ -280,7 +321,7 @@ class Wizard(Player):
         """
         :return: player's current stats
         """
-        return super().get_stats() + f'\nmagic_barrier: {self.magic_barrier}'
+        print(super().get_stats() + f'\nmagic_barrier: {self.magic_barrier}')
 
     @property
     def magic_barrier(self):
@@ -305,7 +346,7 @@ class Wizard(Player):
             self.battle.round(self.battle.list_of_enemies[int(enemy_id) - 1],
                               Player(self.name, 10, 10, self.speed, int(self.power*1.2), 'attack avatar'))
         else:
-            self.battle.display.add_info('You have missed the enemy')
+            print('You have missed the enemy')
             self.battle.round([], Player(self.name, 10, 10, self.speed, int(self.power*1.2), 'attack avatar'))
 
     def take_dmg(self, dmg: int):
@@ -315,9 +356,9 @@ class Wizard(Player):
         """
         if self.magic_barrier > 0:
             self._magic_barrier -= dmg
-            self.battle.display.add_info('Your magic barrier has absorbed damage')
+            print('Your magic barrier has absorbed damage')
             if self.magic_barrier <= 0:
-                self.battle.display.add_info('Enemy broke your magic shield')
+                print('Enemy broke your magic shield')
         else:
             self._hp -= dmg
 
@@ -332,15 +373,20 @@ class Wizard(Player):
             print('magic barrier')
         return lvl_up
 
+    @staticmethod
+    def battle_help_command():
+        print('magic attack <enemy id>- attacks chosen enemy with magic attack\n\
+            aoe - attacks every enemies in the battle')
+
 
 class Rouge(Player):
     """
     This is a subclass of a player that is a class of player's character class Rouge
     """
     def __init__(self, name: str, hp_max: int = 20, hp: int = 20, speed: int = 7, power: int = 11,
-                 ch_class: str = 'rouge', current_location_id: int = 0, exp: int = 0, lvl: int = 1,
+                 ch_class: str = 'rouge', exp: int = 0, lvl: int = 1,
                  gold: int = 0, items=None, keys=None, agility: int = 20):
-        super().__init__(name, hp_max, hp, speed, power, ch_class, current_location_id, exp, lvl, gold, items,
+        super().__init__(name, hp_max, hp, speed, power, ch_class, exp, lvl, gold, items,
                          keys)
         self._agility = agility
 
@@ -348,7 +394,7 @@ class Rouge(Player):
         """
         :return: player's current stats
         """
-        return super().get_stats() + f'\nagility: {self.agility}'
+        print(super().get_stats() + f'\nagility: {self.agility}')
 
     @property
     def agility(self):
@@ -393,4 +439,9 @@ class Rouge(Player):
         if random.randint(0, 101) > self.agility:
             self._hp -= dmg
         else:
-            self.battle.display.add_info(f'You took {dmg} points of damage')
+            print(f'You took {dmg} points of damage')
+
+    @staticmethod
+    def battle_help_command():
+        print('fast attack <enemy id>- attacks chosen enemy with quick attack\n\
+        life steal - attack chosen enemy and steals small amount of his hp healing player')

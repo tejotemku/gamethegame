@@ -2,30 +2,27 @@ class Location:
     """
     This class defines basic properties and methods of a location
     """
-    def __init__(self, loc_id, loc_type, loc_name, loc_description, locations, hidden_items=None, enemies=None,
+    def __init__(self, loc_id, loc_name, loc_description, locations, hidden_items=None,
                  key=None):
         """
         This initiates a location object
         :param loc_id: id number
-        :param loc_type: type of a location town/normal/boss/treasure
         :param loc_name: name
         :param loc_description: description
         :param locations: nearby locations that you can go to
         :param hidden_items: items hidden in this place
-        :param enemies: enemies that player will encounter in this area
         :param key: key needed to enter this area
         """
         self._id = loc_id
-        self._type = loc_type
+        self._type = 'vanilla'
         self._name = loc_name
         self._description = loc_description
-        self._nearby_locations = []
+        self._nearby_locations = {}
         if locations:
-            self._nearby_locations.extend(locations)
+            self._nearby_locations.update(locations)
         self._hidden_items = []
         if hidden_items:
             self._hidden_items.extend(hidden_items)
-        self._enemies = enemies
         self._key = key
 
     @property
@@ -48,27 +45,28 @@ class Location:
     def nearby_locations(self):
         return self._nearby_locations
 
-    def add_nearby_location(self, location_id, direction):
+    def add_nearby_location(self, loc_id, loc_name, loc_direction):
         """
         Adds nearby location where player will be able to go from this location
-        :param location_id: new location id
-        :param direction: How the direction to new location will be called
+        :param loc_id: new location id
+        :param loc_name: location name
+        :param loc_direction: How the direction to new location will be called
         """
-        self._nearby_locations.append((location_id, direction))
+        self._nearby_locations.update({
+            'id': loc_id,
+            'name': loc_name,
+            'direction': loc_direction
+        })
+
+    def get_locations(self):
+        for loc in self.nearby_locations:
+            print(f'{loc.get("name")} - {loc.get("direction")}')
 
     @property
     def hidden_items(self):
         items = self._hidden_items
         self._hidden_items = None
         return items
-
-    @property
-    def enemies(self):
-        return self._enemies
-
-    @enemies.deleter
-    def enemies(self):
-        self._enemies = None
 
     @property
     def key(self):
@@ -80,5 +78,35 @@ class Location:
         """
         self._key = None
 
+    def basic_commands(self):
+        commands = {
+            'look around': self.get_locations()
+        }
+        return commands
+
+    @staticmethod
+    def help_command():
+        print('look around - to find all possible directions you can go to')
+
     def __str__(self):
         return self.description
+
+
+class Town(Location):
+    def __init__(self, loc_id, loc_name, loc_description, locations, hidden_items=None,
+                 key=None):
+        super().__init__(loc_id, loc_name, loc_description, locations, hidden_items,
+                         key)
+        self._type = 'town'
+
+    def get_locations(self):
+        super().get_locations()
+        print('--Town shop--')
+
+
+class BattleLocation(Location):
+    def __init__(self, loc_id, loc_name, loc_description, locations, enemies, hidden_items=None,
+                 key=None):
+        super().__init__(loc_id, loc_name, loc_description, locations, hidden_items,
+                         key)
+        self.enemies = enemies
