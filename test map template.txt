@@ -1,71 +1,67 @@
 {
 "player": null,
 "current location": 0,
-"locations":
-    [
+"locations": [
         {
         "id": 0,
         "name": "Grobla",
         "type": "town",
         "description": "This is a town called Grobla",
         "locations": [
-                        {
-                        "id": 1,
-                        "direction": "Go west"
-                        },
-
-                        {
-                        "id": 2,
-                        "direction": "Go under south bridge"
-                        }
-                      ],
-         "hidden items": ["small potion"]
+             {
+             "id": 1,
+             "direction": "Go west"
+             },
+             {
+             "id": 2,
+             "direction": "Go under south bridge"
+             }],
+        "hidden items": ["small potion"],
+        "key": null
         },
-         {
+        {
         "id": 1,
         "name": "King's Road",
         "type": "vanilla",
         "description": "This is King's road",
         "locations": [
-                        {
-                        "id": 0,
-                        "direction": "Head east to town"
-                        },
-
-                        {
-                        "id": 3,
-                        "direction": "Enter forest"
-                        }
-                      ],
-         "hidden items": []
+            {
+            "id": 0,
+            "direction": "Head east to town"
+            },
+            {
+            "id": 3,
+            "direction": "Enter forest"
+            }],
+        "hidden items": ["rusty key"],
+        "key": null
         },
-         {
+        {
         "id": 2,
         "name": "Old Road",
         "type": "battle",
         "description": "This is an Old Road",
         "locations": [
-                        {
-                        "id": 0,
-                        "direction": "Enter a town"
-                        }
-                      ],
-         "hidden items": []
+            {
+            "id": 0,
+            "direction": "Enter a town"
+            }],
+        "hidden items": [],
+        "enemies": null,
+        "key": null
         },
-         {
+        {
         "id": 3,
         "name": "Forest",
         "type": "vanilla",
         "description": "This is a dark forrest",
         "locations": [
-                        {
-                        "id": 1,
-                        "direction": "Leave forest"
-                        }
-                      ],
-         "hidden items": []
-        }
-
-    ]
+            {
+            "id": 1,
+            "direction": "Leave forest"
+            }],
+        "hidden items": [],
+        "key": "rusty key"
+        }]
 
 }

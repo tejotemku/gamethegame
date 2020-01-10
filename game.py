@@ -64,13 +64,12 @@ class Game:
             if command in commands:
                 commands.get(command)()
                 return
-
-            if self.map.game_state == 'saving':
-                self.map.game_state = 'explore'
-                self.save_game(command)
-                return
             elif self.map.game_state == 'explore':
                 self.exploring_actions(command)
+                return
+            elif self.map.game_state == 'saving':
+                self.map.game_state = 'explore'
+                self.save_game(command)
                 return
             elif self.map.game_state == 'battle':
                 self.battle_actions(command)
@@ -137,6 +136,7 @@ class Game:
 
         if command == 'search':
             self.map.player.new_items(self.map.current_location.find_hidden_items())
+            return
 
         if self.map.current_location.type == 'town':
             if self.compare_commands('shop', command):
@@ -146,6 +146,7 @@ class Game:
                 self.map.game_state = 'saving'
                 print('Type the name of the save')
                 return
+        self.map.move(command)
 
     def battle_actions(self, command):
         """

@@ -31,7 +31,8 @@
              "id": 2,
              "direction": "Go under south bridge"
              }],
-        "hidden items": ["small potion"]
+        "hidden items": ["small potion"],
+        "key": null
         },
         {
         "id": 1,
@@ -47,7 +48,8 @@
             "id": 3,
             "direction": "Enter forest"
             }],
-        "hidden items": []
+        "hidden items": ["rusty key"],
+        "key": null
         },
         {
         "id": 2,
@@ -60,7 +62,8 @@
             "direction": "Enter a town"
             }],
         "hidden items": [],
-        "enemies": null
+        "enemies": null,
+        "key": null
         },
         {
         "id": 3,
@@ -72,7 +75,8 @@
             "id": 1,
             "direction": "Leave forest"
             }],
-        "hidden items": []
+        "hidden items": [],
+        "key": "rusty key"
         }],
 "current location": 0
 }

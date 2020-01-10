@@ -1,6 +1,5 @@
 from location import Location
 from battle import Battle
-from enemy import enemies
 
 
 class Map:
@@ -52,16 +51,18 @@ class Map:
 
     # movement related methods
     def move(self, command):
-        for loc_id, loc_direction in self.current_location.nearby_locations:
-            if self.compare_commands(loc_direction, command):
-                if self.locations[loc_id].key:
-                    if self.player.remove_item(self.locations[loc_id].key):
-                        self.locations[loc_id].open_location()
-                        print(f"You have opened: {self.locations[loc_id].name}")
-                        self.move_to_different_location(loc_id)
+        for loc in self.current_location.nearby_locations:
+            if self.compare_commands(loc.get('direction'), command):
+                if self.locations[loc.get('id')].key:
+                    if self.player.remove_item(self.locations[loc.get('id')].key):
+                        self.locations[loc.get('id')].open_location()
+                        print(f"You have opened: {self.locations[loc.get('id')].name}")
+                        self.move_to_different_location(loc.get('id'))
                         return
+                    else:
+                        print(f'You need {self.locations[loc.get("id")].key} to open this location')
                 else:
-                    self.move_to_different_location(loc_id)
+                    self.move_to_different_location(loc.get('id'))
                     return
 
     def move_to_different_location(self, location_id: int):
@@ -69,7 +70,7 @@ class Map:
         Changes curret location of a player
         :param location_id: locations player are moving into
         """
-        self.current_location = self.locations[location_id]
+        self._current_location = self.locations[location_id]
         print(f'You have entered: {self.current_location.name}')
         print(self.current_location.description)
 

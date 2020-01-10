@@ -73,7 +73,8 @@ def map_json_serializer(o: Map):
             'type': loc.type,
             'description': loc.description,
             'locations': loc.nearby_locations,
-            'hidden items': loc.hidden_items
+            'hidden items': loc.hidden_items,
+            'key': loc.key
         }
         loc_dict.update(location_types.get(loc.type)(loc))
         locations_table.append(loc_dict)
@@ -153,7 +154,8 @@ def map_json_deserializer(file):
             loc_name=d.get('name'),
             loc_description=d.get('description'),
             locations=d.get('locations'),
-            hidden_items=d.get('hidden items')
+            hidden_items=d.get('hidden items'),
+            key=d.get('key')
         )
 
     def town_loc_json_deserializer(d: dict):
@@ -162,7 +164,8 @@ def map_json_deserializer(file):
             loc_name=d.get('name'),
             loc_description=d.get('description'),
             locations=d.get('locations'),
-            hidden_items=d.get('hidden items')
+            hidden_items=d.get('hidden items'),
+            key=d.get('key')
         )
 
     def battle_loc_deserializer(d: dict):
@@ -172,7 +175,8 @@ def map_json_deserializer(file):
             loc_description=d.get('description'),
             locations=d.get('locations'),
             hidden_items=d.get('hidden items'),
-            enemies=d.get('enemies')
+            enemies=d.get('enemies'),
+            key=d.get('key')
         )
 
     location_types = {
@@ -197,4 +201,3 @@ def map_json_deserializer(file):
             locations=locations,
             cur_loc=map_dict.get('current location')
         )
-
