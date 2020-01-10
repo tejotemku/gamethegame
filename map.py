@@ -17,7 +17,7 @@ class Map:
         self._game_state = 'explore'
         self._locations = []
         self._locations.extend(locations)
-        self.current_location = locations[cur_loc]
+        self._current_location = locations[cur_loc]
 
     @property
     def player(self):
@@ -26,6 +26,10 @@ class Map:
     @player.setter
     def player(self, new_player):
         self._player = new_player
+
+    @property
+    def current_location(self):
+        return self._current_location
 
     @property
     def locations(self):

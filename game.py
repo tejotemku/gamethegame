@@ -48,28 +48,39 @@ class Game:
         This is general command handler that sends command to more specific handlers depending on game state
         :param command: inputted command
         """
-        commands = {
-            'help': self.help_command(),
-            'quit': self.quit()
-        }
-        commands.update(self.map.player.basic_commands())
-        commands.update(self.map.locations[self.map.player.current_location].basic_commands)
 
         if not self.map:
             self.load_map(command)
         elif self.map.game_state == 'choose class':
             self.choose_class(command)
-        elif self.map.game_state == 'saving':
-            self.map.game_state = 'explore'
-            self.save_game(command)
-        elif self.map.game_state == 'explore':
-            self.exploring_actions(command)
-        elif self.map.game_state == 'battle':
-            self.battle_actions(command)
-        elif self.map.game_state == 'level up':
-            self.level_up_actions(command)
-        elif self.map.game_state == 'merchant':
-            self.shop_actions(command)
+        else:
+            commands = {
+                'help': self.help_command,
+                'quit': self.quit
+            }
+            commands.update(self.map.player.basic_commands())
+            commands.update(self.map.current_location.basic_commands())
+
+            if command in commands:
+                commands.get(command)()
+                return
+
+            if self.map.game_state == 'saving':
+                self.map.game_state = 'explore'
+                self.save_game(command)
+                return
+            elif self.map.game_state == 'explore':
+                self.exploring_actions(command)
+                return
+            elif self.map.game_state == 'battle':
+                self.battle_actions(command)
+                return
+            elif self.map.game_state == 'level up':
+                self.level_up_actions(command)
+                return
+            elif self.map.game_state == 'merchant':
+                self.shop_actions(command)
+                return
 
     def load_map(self, file_name):
         """
@@ -83,6 +94,8 @@ class Game:
             if not self.map.player:
                 print('Choose your class: rouge, knight or wizard')
                 self.map.game_state = 'choose class'
+            else:
+                print('Write command \'help\' to view commands you can use!')
         except FileNotFoundError:
             print('Map file does not exist! Try again.')
 
@@ -113,6 +126,7 @@ class Game:
                 print('Choose your name')
                 self.map.player = classes.get(c)(str(input()))
                 self.map.game_state = 'explore'
+                print('Write command \'help\' to view commands you can use!')
                 return
 
     def exploring_actions(self, command):
@@ -120,16 +134,11 @@ class Game:
         Command handler during exploring map
         :param command: inputted command
         """
-        commands = {
-            'search': self.map.player.new_items(self.map.locations[self.map.player.current_location].hidden_items)
-        }
 
-        for c in commands:
-            if self.compare_commands(c, command):
-                commands.get(c)
-                return
+        if command == 'search':
+            self.map.player.new_items(self.map.current_location.find_hidden_items())
 
-        if self.map.locations[self.map.player.current_location].type == 'town':
+        if self.map.current_location.type == 'town':
             if self.compare_commands('shop', command):
                 self.map.game_state = 'merchant'
                 return
@@ -229,12 +238,15 @@ class Game:
 
     def help_command(self):
         self.map.player.help_command()
-        self.map.locations[self.map.player.current_location].help_command()
+        self.map.current_location.help_command()
 
         game_states = {
-            'battle': self.map.player.battle_help_command(),
-            'merchant': print('leave - to leave the shop')
+            'battle': self.map.player.battle_help_command,
+            'merchant': Shop.leave_shop
         }
+
+        if self.map.game_state in game_states:
+            game_states.get(self.map.game_state)()
 
         if self.map.current_location == 'town':
             print('save - to save the game\nshop - to go to town shop')

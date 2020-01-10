@@ -223,11 +223,11 @@ class Player:
 
     def basic_commands(self):
         commands = {
-            'stats': self.get_stats(),
-            'gold': self.get_gold(),
-            'items': self.get_items(),
-            'level': self.get_level(),
-            'help': self.help_command()
+            'stats': self.get_stats,
+            'gold': self.get_gold,
+            'items': self.get_items,
+            'level': self.get_level,
+            'help': self.help_command
         }
 
         if self.items.get('small potion') > 0:
@@ -242,8 +242,8 @@ class Player:
     @staticmethod
     def help_command():
         print('stats - to check your attributes\ngold - to check your gold\nitems - check your items\n\
-        level - check your level and exp\nsmall potion - to use potion if you have it\n\
-        big potion - to use potion if you have it\n')
+level - check your level and exp\nsmall potion - to use potion if you have it\n\
+big potion - to use potion if you have it')
 
 
 class Knight(Player):
@@ -303,7 +303,7 @@ class Knight(Player):
     @staticmethod
     def battle_help_command():
         print('normal attack <enemy id>- attacks chosen enemy with basic attack\n\
-        heavy attack - attacks chosen enemy with powerful heavy attack, but with lower speed and small chance to miss')
+heavy attack - attacks chosen enemy with powerful heavy attack, but with lower speed and small chance to miss')
 
 
 class Wizard(Player):
@@ -321,7 +321,8 @@ class Wizard(Player):
         """
         :return: player's current stats
         """
-        print(super().get_stats() + f'\nmagic_barrier: {self.magic_barrier}')
+        super().get_stats()
+        print(f'magic_barrier: {self._magic_barrier}')
 
     @property
     def magic_barrier(self):
@@ -376,7 +377,7 @@ class Wizard(Player):
     @staticmethod
     def battle_help_command():
         print('magic attack <enemy id>- attacks chosen enemy with magic attack\n\
-            aoe - attacks every enemies in the battle')
+aoe - attacks every enemies in the battle')
 
 
 class Rouge(Player):
@@ -394,7 +395,7 @@ class Rouge(Player):
         """
         :return: player's current stats
         """
-        print(super().get_stats() + f'\nagility: {self.agility}')
+        print(super().get_stats() + f'agility: {self.agility}')
 
     @property
     def agility(self):
@@ -444,4 +445,4 @@ class Rouge(Player):
     @staticmethod
     def battle_help_command():
         print('fast attack <enemy id>- attacks chosen enemy with quick attack\n\
-        life steal - attack chosen enemy and steals small amount of his hp healing player')
+life steal - attack chosen enemy and steals small amount of his hp healing player')

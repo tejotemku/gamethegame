@@ -17,9 +17,9 @@ class Location:
         self._type = 'vanilla'
         self._name = loc_name
         self._description = loc_description
-        self._nearby_locations = {}
+        self._nearby_locations = []
         if locations:
-            self._nearby_locations.update(locations)
+            self._nearby_locations.extend(locations)
         self._hidden_items = []
         if hidden_items:
             self._hidden_items.extend(hidden_items)
@@ -45,26 +45,27 @@ class Location:
     def nearby_locations(self):
         return self._nearby_locations
 
-    def add_nearby_location(self, loc_id, loc_name, loc_direction):
+    def add_nearby_location(self, loc_id, loc_direction):
         """
         Adds nearby location where player will be able to go from this location
         :param loc_id: new location id
-        :param loc_name: location name
         :param loc_direction: How the direction to new location will be called
         """
-        self._nearby_locations.update({
+        self._nearby_locations.append({
             'id': loc_id,
-            'name': loc_name,
             'direction': loc_direction
         })
 
     def get_locations(self):
         for loc in self.nearby_locations:
-            print(f'{loc.get("name")} - {loc.get("direction")}')
+            print(loc.get("direction"))
 
     @property
     def hidden_items(self):
-        items = self._hidden_items
+        return self._hidden_items
+
+    def find_hidden_items(self):
+        items = self.hidden_items
         self._hidden_items = None
         return items
 
@@ -80,7 +81,7 @@ class Location:
 
     def basic_commands(self):
         commands = {
-            'look around': self.get_locations()
+            'look around': self.get_locations
         }
         return commands
 
@@ -101,7 +102,7 @@ class Town(Location):
 
     def get_locations(self):
         super().get_locations()
-        print('--Town shop--')
+        print('Go to town shop')
 
 
 class BattleLocation(Location):
@@ -109,4 +110,9 @@ class BattleLocation(Location):
                  key=None):
         super().__init__(loc_id, loc_name, loc_description, locations, hidden_items,
                          key)
-        self.enemies = enemies
+        self._enemies = enemies
+        self._type = 'battle'
+
+    @property
+    def enemies(self):
+        return self._enemies

@@ -12,6 +12,10 @@ class Shop:
     def items(self):
         return self._items
 
+    @staticmethod
+    def leave_shop():
+        print('leave - to leave the shop')
+
     def __str__(self):
         string = ""
         for i in self.items:
