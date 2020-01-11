@@ -1,5 +1,15 @@
-# gamethegame
-Adventure Text Game for a university project,
-by Filip Drygaś,
-game is started by game.py file,
-game is written in Python 3.8
+# Game: The Game
+
+Text Adventure Game for University project
+
+### Prerequisites
+
+Python 3.8 interpreter
+
+## Starting the game
+Game is started by game.py file
+
+
+## Authors
+
+* **Filip Drygaś** - *Initial work* 
