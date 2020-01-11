@@ -1,6 +1,5 @@
-from location import Location
+from location import Location, BattleLocation
 from battle import Battle
-
 
 class Map:
     """
@@ -61,9 +60,11 @@ class Map:
                         return
                     else:
                         print(f'You need {self.locations[loc.get("id")].key} to open this location')
+                        return
                 else:
                     self.move_to_different_location(loc.get('id'))
                     return
+        print('Invalid Command')
 
     def move_to_different_location(self, location_id: int):
         """
@@ -73,6 +74,10 @@ class Map:
         self._current_location = self.locations[location_id]
         print(f'You have entered: {self.current_location.name}')
         print(self.current_location.description)
+        if type(self.current_location) == BattleLocation:
+            if self.current_location.enemies:
+                self.player.battle = Battle(self.current_location.enemies, self)
+                self.game_state = 'battle'
 
     # battle methods
     def start_battle(self, list_of_enemies):
@@ -98,12 +103,14 @@ class Map:
             self.player.add_gold(gold)
             for item in acquired_items:
                 self.player.add_new_item(item)
-            del self.locations[self.player.current_location].enemies
+            self.current_location.enemies = None
             if self.player.add_exp(exp):
                 self.game_state = 'level up'
+            if self.player.character_class == 'wizard':
+                self.player.reset_magic_barrier()
         else:
             self.game_state = 'game_over'
-            self.player.display.notification_box('Game Over!', 5)
+            print('Game Over!')
         pass
 
     @staticmethod

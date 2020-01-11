@@ -58,4 +58,5 @@ class Enemy:
         return self._exp_reward, self._gold_reward
 
 
-enemies = {'thief': Enemy('thief', 4, 5, 15, 15, 10)}
+enemies = {
+    'thief': Enemy(name='thief', power=3, speed=5, hp=11, exp=11, gold=10)}

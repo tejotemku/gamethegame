@@ -64,22 +64,17 @@ class Game:
             if command in commands:
                 commands.get(command)()
                 return
-            elif self.map.game_state == 'explore':
-                self.exploring_actions(command)
-                return
-            elif self.map.game_state == 'saving':
-                self.map.game_state = 'explore'
-                self.save_game(command)
-                return
-            elif self.map.game_state == 'battle':
-                self.battle_actions(command)
-                return
-            elif self.map.game_state == 'level up':
-                self.level_up_actions(command)
-                return
-            elif self.map.game_state == 'merchant':
-                self.shop_actions(command)
-                return
+            else:
+                game_states = {
+                    'explore': self.exploring_actions,
+                    'saving': self.save_game,
+                    'battle': self.battle_actions,
+                    'level up': self.level_up_actions,
+                    'merchant': self.shop_actions
+                }
+                if self.map.game_state in game_states:
+                    game_states.get(self.map.game_state)(command)
+                    return
 
     def load_map(self, file_name):
         """
@@ -103,6 +98,7 @@ class Game:
         Saves the game to file
         :param game_save_name: game's save file's name
         """
+        self.map.game_state = 'explore'
         json_string = map_json_serializer(self.map)
         with open(game_save_name + '.txt', 'w') as file:
             file.write(json_string)
@@ -127,6 +123,7 @@ class Game:
                 self.map.game_state = 'explore'
                 print('Write command \'help\' to view commands you can use!')
                 return
+        print('Invalid Command')
 
     def exploring_actions(self, command):
         """
@@ -137,8 +134,15 @@ class Game:
         if command == 'search':
             self.map.player.new_items(self.map.current_location.find_hidden_items())
             return
-
-        if self.map.current_location.type == 'town':
+        elif command == 'level up':
+            if self.map.player.skill_points > 0:
+                self.map.game_state = 'level up'
+                self.map.player.upgrade()
+                return
+            else:
+                print('You don\'t have skill points')
+                return
+        elif self.map.current_location.type == 'town':
             if self.compare_commands('shop', command):
                 self.map.game_state = 'merchant'
                 return
@@ -155,69 +159,63 @@ class Game:
         """
         player_class = self.map.player.character_class
 
-        if player_class == 'knight':
-            if self.compare_commands('normal', command):
-                self.map.player.normal_attack(command.split(' ')[-1])
-            elif self.compare_commands('heavy', command):
-                self.map.player.heavy_attack(command.split(' ')[-1])
-            elif self.compare_commands('help', command):
-                print('Try:\nitems - list items you can use in battle\n\
-                normal attack <enemy id> - uses normal attack on selected enemy\n\
-                heavy attack <enemy id> - uses heavy attack on selected enemy\nquit - quits game')
+        if player_class == 'wizard' and command == 'aoe':
+            self.map.player.aoe_attack()
+            return
 
-        elif player_class == 'wizard':
-            if self.compare_commands('aoe', command):
-                self.map.player.aoe_attack()
-            elif self.compare_commands('magic', command):
-                self.map.player.magic_attack(command.split(' ')[-1])
-            elif self.compare_commands('help', command):
-                print('Try:\nitems - list items you can use in battle\n\
-                               magic attack <enemy id> - uses magic attack on selected enemy\n\
-                               aoe - attacks all enemies\nquit - quits game')
-        elif player_class == 'rouge':
-            if self.compare_commands('life steal', command):
-                self.map.player.life_stealing_blade_attack(command.split(' ')[-1])
-            elif self.compare_commands('fast', command):
-                self.map.player.fast_attack(command.split(' ')[-1])
-            elif self.compare_commands('help', command):
-                print('Try:\nitems - list items you can use in battle\n\
-                               life steal <enemy id> - uses attack on selected enemy that steals his hp and heals you\n\
-                               fast attack <enemy id> - uses fast attack on selected enemy\nquit - quits game')
-        if self.compare_commands('small potion', command) and self.map.player.remove_item('small potion'):
-            self.map.player.heal(10)
-            self.map.player.display.add_info('You have been healed')
-            self.map.player.battle.round(None, None)
-        if self.compare_commands('big potion', command) and self.map.player.remove_item('big potion'):
-            self.map.player.heal(25)
-            self.map.player.display.add_info('You have been healed')
-            self.map.player.battle.round(None, None)
+        if len(command.split(' ')) > 1:
+            enemy = command.split(' ')[-1]
+            length = 1 + len(enemy)
+            attack = command[:-length]
+            if enemy.isdigit():
+                actions = {}
+                if player_class == 'knight':
+                    actions = {
+                        'normal': self.map.player.normal_attack,
+                        'heavy':  self.map.player.heavy_attack
+                        }
+                elif player_class == 'wizard':
+                    actions = {
+                        'magic': self.map.player.magic_attack
+                        }
+                elif player_class == 'rouge':
+                    actions = {
+                        'life steal': self.map.player.life_stealing_blade_attack,
+                        'fast':  self.map.player.fast_attack
+                        }
+
+                if attack in actions:
+                    if int(enemy) <= len(self.map.player.battle.list_of_enemies):
+                        actions.get(attack)(enemy)
+                        return
+                    else:
+                        print('There is no enemy with that id')
+        else:
+            print('Invalid Command')
 
     def level_up_actions(self, command):
         """
         Command handler when player level ups
         :param command: inputted command
         """
-        if self.compare_commands('power', command):
-            self.map.player.power_increase()
-            self.map.player.display.add_info(f'You have increased your power up to {self.map.player.power}')
+
+        upgrades = {
+            'power': self.map.player.power_increase,
+            'speed': self.map.player.speed_increase,
+            'hp': self.map.player.hp_increase,
+        }
+        if self.map.player.character_class == 'rouge':
+            upgrades.update({'agility': self.map.player.agility_increase})
+        elif self.map.player.character_class == 'wizard':
+            upgrades.update({
+                'magic barrier': self.map.player.magic_barrier_increase})
+
+        if command in upgrades:
+            upgrades.get(command)()
             self.map.game_state = 'explore'
-        if self.compare_commands('speed', command):
-            self.map.player.speed_increase()
-            self.map.player.display.add_info(f'You have increased your speed up to {self.map.player.speed}')
-            self.map.game_state = 'explore'
-        if self.compare_commands('hp', command):
-            self.map.player.hp_increase()
-            self.map.player.display.add_info(f'You have increased your hp up to {self.map.player.hp}')
-            self.map.game_state = 'explore'
-        if self.compare_commands('agility', command) and self.map.player.character_class == 'rouge':
-            self.map.player.agility_increase()
-            self.map.player.display.add_info(f'You have increased your agility up to {self.map.player.agility}')
-            self.map.game_state = 'explore'
-        if self.compare_commands('magic barrier', command) and self.map.player.character_class == 'wizard':
-            self.map.player.magic_barrier_increase()
-            self.map.player.display.add_info(f'You have increased your magic barrier up to \
-{self.map.player.magic_barrier}')
-            self.map.game_state = 'explore'
+            return
+
+        print('Invalid Command')
 
     def shop_actions(self, command):
         """
@@ -231,11 +229,15 @@ class Game:
                     self.map.player.add_new_item(key)
                     print(f'You have bought {key}')
                     self.map.game_state = 'explore'
+                    return
                 else:
                     print('You don\'t have enough gold')
+                    return
         if self.compare_commands(command, 'leave'):
             self.map.game_state = 'explore'
             print('You have left the shop')
+            return
+        print('Invalid Command')
 
     def help_command(self):
         self.map.player.help_command()

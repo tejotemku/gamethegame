@@ -47,7 +47,7 @@
             "direction": "Enter a town"
             }],
         "hidden items": [],
-        "enemies": null,
+        "enemies": ["thief", "thief"],
         "key": null
         },
         {

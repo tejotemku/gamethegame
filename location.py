@@ -116,3 +116,7 @@ class BattleLocation(Location):
     @property
     def enemies(self):
         return self._enemies
+
+    @enemies.setter
+    def enemies(self, value):
+        self._enemies = value

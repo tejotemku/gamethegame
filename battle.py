@@ -1,4 +1,5 @@
-from enemy import Enemy
+from enemy import Enemy, enemies
+import copy
 import random
 
 
@@ -14,11 +15,17 @@ class Battle:
         """
         self._player = game_map.player
         self._list_of_enemies = []
-        self._list_of_enemies.extend(list_of_enemies)
+        if type(list_of_enemies) == Enemy:
+            self._list_of_enemies = copy.deepcopy(enemies.get(list_of_enemies))
+        else:
+            for enemy in list_of_enemies:
+                self._list_of_enemies.append(copy.deepcopy(enemies.get(enemy)))
+
         self._rounds = 1
         self._map = game_map
         self._reward_gold = 0
         self._reward_exp = 0
+        self.start()
 
     @property
     def player(self):
@@ -52,25 +59,25 @@ class Battle:
 
     def start(self):
         print('-------Battle starts!-------')
-        print(f'Round: {self.rounds}')
         self.list_enemies()
 
     def list_enemies(self):
+        print(f'Round: {self.rounds}')
         for i, enemy in enumerate(self.list_of_enemies):
-            print(f'{i}: {enemy.name} - {enemy.hp} hp')
+            print(f'{i+1}: {enemy.name} - {enemy.hp} hp')
 
-    def round(self, list_of_targets, players_avatar):
+    def round(self, targets, players_avatar):
         """
         This method manages attacks during round of a battle
-        :param list_of_targets: list of enemies that player will hit
+        :param targets: list of enemies that player will hit
         :param players_avatar: new temporary player instance that holds modified power and speed value
         """
         list_of_attacks_this_round = []
 
-        if type(list_of_targets) == Enemy:
-            list_of_attacks_this_round.append((list_of_targets, players_avatar))
+        if type(targets) == Enemy:
+            list_of_attacks_this_round.append((targets, players_avatar))
         else:
-            for target in list_of_targets:
+            for target in targets:
                 list_of_attacks_this_round.append((target, players_avatar))
 
         for enemy in self._list_of_enemies:
@@ -87,6 +94,8 @@ class Battle:
             if not enemy.check_if_alive():
                 self.add_gold(enemy.rewards[1])
                 self.add_exp(enemy.rewards[0])
+                print(f'{enemy.name} has been defeated')
+                self.game_map.current_location.enemies = self.list_of_enemies
                 self.list_of_enemies.remove(enemy)
 
         if self.has_battle_ended():

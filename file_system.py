@@ -36,6 +36,7 @@ def map_json_serializer(o: Map):
             'name': player.name,
             'class': player.character_class,
             'level': player.level,
+            'skill points': player.skill_points,
             'exp': player.exp,
             'gold': player.gold,
             'hp max': player.hp_max,
@@ -106,7 +107,8 @@ def map_json_deserializer(file):
             power=d.get('power'),
             speed=d.get('speed'),
             items=d.get('items'),
-            keys=d.get('keys')
+            keys=d.get('keys'),
+            skill_points=d.get('skill points')
         )
 
     def wizard_json_deserializer(d: dict):
@@ -122,6 +124,7 @@ def map_json_deserializer(file):
             speed=d.get('speed'),
             items=d.get('items'),
             keys=d.get('keys'),
+            skill_points=d.get('skill points'),
             magic_barrier=d.get('magic barrier')
         )
 
@@ -138,6 +141,7 @@ def map_json_deserializer(file):
             speed=d.get('speed'),
             items=d.get('items'),
             keys=d.get('keys'),
+            skill_points=d.get('skill points'),
             agility=d.get('agility')
         )
 

@@ -8,7 +8,7 @@ class Player:
     This is a class of a player
     """
     def __init__(self, name: str, hp_max: int, hp: int, speed: int, power: int, character_class: str,
-                 exp: int = 0, lvl: int = 0, gold: int = 0, items=None, keys=None):
+                 exp: int = 0, lvl: int = 0, skill_points: int = 0, gold: int = 0, items=None, keys=None):
         """
         This method initiates a player object
         """
@@ -19,6 +19,7 @@ class Player:
         # exp and gold
         self._experience = exp
         self._lvl = lvl
+        self._skill_points = skill_points
         self._gold = gold
         # basic stats
         self._power = power
@@ -56,7 +57,6 @@ class Player:
     @battle.setter
     def battle(self, new_battle: Battle):
         self._battle = new_battle
-        self.battle.start()
 
     # exp, lvl
 
@@ -74,7 +74,8 @@ class Player:
         return self.level_up()
 
     def get_level(self):
-        print(f'Level: {self.level}\nExp: {self.exp}\nYou need {int(10*pow(1.2, self.level))-self.exp} exp to level up')
+        print(f'Level: {self.level}\nExp: {self.exp}\nYou need {int(10*pow(1.2, self.level))-self.exp} \
+exp to level up\nSkill points: {self.skill_points}')
 
     @property
     def level(self):
@@ -91,8 +92,22 @@ class Player:
             self._lvl += 1
             self._experience -= exp_to_level_up
             print(f'You have leveled up! \nYou are currently on level {self.level}!\
-            \nYou can upgrade one of the following:\npower\nspeed\nhp')
+            \nYou have got a skill point and now you have {self.skill_points}')
         return lvl_up
+
+    @staticmethod
+    def upgrade():
+        print('You can upgrade one of the following:\npower\nspeed\nhp')
+
+    @property
+    def skill_points(self):
+        return self._skill_points
+
+    def remove_skill_point(self):
+        self._skill_points -= 1
+
+    def add_skill_point(self):
+        self._skill_points += 1
 
     # gold methods
 
@@ -138,6 +153,8 @@ class Player:
 
     def power_increase(self):
         self._power += 1
+        self.remove_skill_point()
+        print(f'Increased your power up to {self.power}')
 
     @property
     def speed(self):
@@ -145,6 +162,8 @@ class Player:
 
     def speed_increase(self):
         self._speed += 1
+        self.remove_skill_point()
+        print(f'Increased your speed up to {self.speed}')
 
     @property
     def hp(self):
@@ -157,6 +176,8 @@ class Player:
     def hp_increase(self):
         self._hp += 3
         self._hp_max += 3
+        self.remove_skill_point()
+        print(f'Increased your max hp up to {self.hp_max}')
 
     def heal(self, healed_hp_points):
         """
@@ -252,13 +273,13 @@ class Knight(Player):
     """
 
     def __init__(self, name: str, hp_max: int = 40, hp: int = 40, speed: int = 5, power: int = 8,
-                 ch_class: str = 'knight', exp: int = 0, lvl: int = 1,
+                 ch_class: str = 'knight', exp: int = 0, lvl: int = 1, skill_points: int = 0,
                  gold: int = 0, items=None, keys=None):
         """
         This method creates object of Knight
         """
-        super().__init__(name, hp_max, hp, speed, power, ch_class, exp, lvl, gold, items,
-                         keys)
+        super().__init__(name=name, hp_max=hp_max, hp=hp, speed=speed, power=power, character_class=ch_class, exp=exp,
+                         lvl=lvl, skill_points=skill_points, gold=gold, items=items, keys=keys)
         # heavy armor of a knight reduces damage
         self.dmg_reduction = 2
 
@@ -311,11 +332,12 @@ class Wizard(Player):
     This is a subclass of a player that is a class of player's character class Knight
     """
     def __init__(self, name: str, hp_max: int = 18, hp: int = 18, speed: int = 7, power: int = 5,
-                 ch_class: str = 'wizard', exp: int = 0, lvl: int = 1,
+                 ch_class: str = 'wizard', exp: int = 0, lvl: int = 1, skill_points: int = 0,
                  gold: int = 0, items=None, keys=None, magic_barrier: int = 4):
-        super().__init__(name, hp_max, hp, speed, power, ch_class, exp, lvl, gold, items,
-                         keys)
+        super().__init__(name=name, hp_max=hp_max, hp=hp, speed=speed, power=power, character_class=ch_class, exp=exp,
+                         lvl=lvl, skill_points=skill_points, gold=gold, items=items, keys=keys)
         self._magic_barrier = magic_barrier
+        self._magic_barrier_max = magic_barrier
 
     def get_stats(self):
         """
@@ -328,8 +350,17 @@ class Wizard(Player):
     def magic_barrier(self):
         return self._magic_barrier
 
+    @property
+    def magic_barrier_max(self):
+        return self._magic_barrier_max
+
+    def reset_magic_barrier(self):
+        self._magic_barrier = self._magic_barrier_max
+
     def magic_barrier_increase(self):
-        self._magic_barrier += 1
+        self._magic_barrier_max += 1
+        self.remove_skill_point()
+        print(f'Increased your magic barrier up to {self.magic_barrier_max}')
 
     def aoe_attack(self):
         """
@@ -359,20 +390,13 @@ class Wizard(Player):
             self._magic_barrier -= dmg
             print('Your magic barrier has absorbed damage')
             if self.magic_barrier <= 0:
-                print('Enemy broke your magic shield')
+                print('Enemy broke your magic barrier')
         else:
             self._hp -= dmg
 
-    def level_up(self):
-        """
-        This is extension of Player's class level_up() method
-        that informs player if he can upgrade magic barrier attribute
-        :return: if player level upped
-        """
-        lvl_up = super().level_up()
-        if lvl_up:
-            print('magic barrier')
-        return lvl_up
+    def upgrade(self):
+        super().upgrade()
+        print('magic barrier')
 
     @staticmethod
     def battle_help_command():
@@ -385,10 +409,10 @@ class Rouge(Player):
     This is a subclass of a player that is a class of player's character class Rouge
     """
     def __init__(self, name: str, hp_max: int = 20, hp: int = 20, speed: int = 7, power: int = 11,
-                 ch_class: str = 'rouge', exp: int = 0, lvl: int = 1,
+                 ch_class: str = 'rouge', exp: int = 0, lvl: int = 1, skill_points: int = 0,
                  gold: int = 0, items=None, keys=None, agility: int = 20):
-        super().__init__(name, hp_max, hp, speed, power, ch_class, exp, lvl, gold, items,
-                         keys)
+        super().__init__(name=name, hp_max=hp_max, hp=hp, speed=speed, power=power, character_class=ch_class, exp=exp,
+                         lvl=lvl, skill_points=skill_points, gold=gold, items=items, keys=keys)
         self._agility = agility
 
     def get_stats(self):
@@ -403,17 +427,12 @@ class Rouge(Player):
 
     def agility_increase(self):
         self._agility += 2
+        self.remove_skill_point()
+        print(f'Increased your agility up to {self.agility}')
 
-    def level_up(self):
-        """
-        This is extension of Player's class level_up() method
-        that informs player if he can upgrade agility attribute
-        :return: if player level upped
-        """
-        lvl_up = super().level_up()
-        if lvl_up:
-            print('agility')
-        return lvl_up
+    def upgrade(self):
+        super().upgrade()
+        print('\nagility')
 
     def life_stealing_blade_attack(self, enemy_id):
         """
