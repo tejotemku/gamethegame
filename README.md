@@ -10,6 +10,6 @@ Python 3.8 interpreter
 Game is started by game.py file
 
 
-## Authors
+## Author
 
 * **Filip Drygaś**
