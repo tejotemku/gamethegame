@@ -104,8 +104,7 @@ class Map:
             for item in acquired_items:
                 self.player.add_new_item(item)
             self.current_location.enemies = None
-            if self.player.add_exp(exp):
-                self.game_state = 'level up'
+            self.player.add_exp(exp)
             if self.player.character_class == 'wizard':
                 self.player.reset_magic_barrier()
         else:

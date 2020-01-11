@@ -91,8 +91,8 @@ exp to level up\nSkill points: {self.skill_points}')
         if lvl_up:
             self._lvl += 1
             self._experience -= exp_to_level_up
-            print(f'You have leveled up! \nYou are currently on level {self.level}!\
-            \nYou have got a skill point and now you have {self.skill_points}')
+            self.add_skill_point()
+            print(f'You have leveled up! \nYou are currently on level {self.level}!')
         return lvl_up
 
     @staticmethod
@@ -108,6 +108,7 @@ exp to level up\nSkill points: {self.skill_points}')
 
     def add_skill_point(self):
         self._skill_points += 1
+        print(f'You have got a skill point and now you have {self.skill_points}')
 
     # gold methods
 
@@ -230,38 +231,54 @@ exp to level up\nSkill points: {self.skill_points}')
         if self.items.__contains__(item):
             if self.items.get(item) > 0:
                 self.items.update({item: self.items.get(item) - 1})
-            has_item = True
-            print(f'Used {item}')
+                has_item = True
+                print(f'Used {item}')
         elif self.keys.__contains__(item):
             self.keys.remove(item)
             has_item = True
             print(f'Used {item}')
+        if not has_item:
+            print(f'You don\'t have {item}')
         return has_item
+
+    def small_potion(self):
+        """
+        uses small potion if player has one
+        """
+        if self.remove_item('small potion'):
+            self.heal(10)
+
+    def big_potion(self):
+        """
+        uses big potion if player has one
+        """
+        if self.remove_item('big potion'):
+            self.heal(25)
 
     @property
     def keys(self):
         return self._keys
 
     def basic_commands(self):
+        """
+        :return: dictionary of basic commands that player can use
+        """
         commands = {
             'stats': self.get_stats,
             'gold': self.get_gold,
             'items': self.get_items,
             'level': self.get_level,
-            'help': self.help_command
+            'small potion': self.small_potion,
+            'big potion': self.big_potion
         }
 
-        if self.items.get('small potion') > 0:
-            commands.update({'small potion': [self.heal(10),
-                            self.remove_item('small potion')]})
-
-        if self.items.get('big potion') > 0:
-            commands.update({'big potion': [self.heal(10),
-                            self.remove_item('big potion')]})
         return commands
 
     @staticmethod
     def help_command():
+        """
+        lists commands that player can use always
+        """
         print('stats - to check your attributes\ngold - to check your gold\nitems - check your items\n\
 level - check your level and exp\nsmall potion - to use potion if you have it\n\
 big potion - to use potion if you have it')
@@ -286,12 +303,15 @@ class Knight(Player):
     def hp_increase(self):
         self._hp += 5
         self._hp_max += 5
+        self.remove_skill_point()
+        print(f'Increased your max hp up to {self.hp_max}')
 
     def get_stats(self):
         """
         :return: player's current stats
         """
-        print(super().get_stats() + f'\ndmg reduction: {self.dmg_reduction}')
+        print(super().get_stats())
+        print(f'dmg reduction: {self.dmg_reduction}')
 
     def normal_attack(self, enemy_id):
         """
@@ -419,7 +439,8 @@ class Rouge(Player):
         """
         :return: player's current stats
         """
-        print(super().get_stats() + f'agility: {self.agility}')
+        super().get_stats()
+        print(f'agility: {self.agility}')
 
     @property
     def agility(self):
@@ -432,7 +453,7 @@ class Rouge(Player):
 
     def upgrade(self):
         super().upgrade()
-        print('\nagility')
+        print('agility')
 
     def life_stealing_blade_attack(self, enemy_id):
         """
@@ -464,4 +485,4 @@ class Rouge(Player):
     @staticmethod
     def battle_help_command():
         print('fast attack <enemy id>- attacks chosen enemy with quick attack\n\
-life steal - attack chosen enemy and steals small amount of his hp healing player')
+life steal <enemy id> - attack chosen enemy and steals small amount of his hp healing player')

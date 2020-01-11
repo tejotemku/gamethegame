@@ -251,7 +251,7 @@ class Game:
         if self.map.game_state in game_states:
             game_states.get(self.map.game_state)()
 
-        if self.map.current_location == 'town':
+        if self.map.current_location.type == 'town':
             print('save - to save the game\nshop - to go to town shop')
 
     @staticmethod
