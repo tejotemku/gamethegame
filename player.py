@@ -1,6 +1,7 @@
 import random
 from battle import Battle
 from shop import Shop
+from colorama import Fore
 
 
 class Player:
@@ -224,7 +225,7 @@ exp to level up\nSkill points: {self.skill_points}')
             self.items.update({item: self.items.get(item) + 1})
         else:
             self._keys.append(item)
-        print(f'You have got new item, {item}!')
+        print(f'You have got new item, {Fore.BLUE}{item}{Fore.WHITE}!')
 
     def remove_item(self, item: str):
         has_item = False
@@ -232,13 +233,13 @@ exp to level up\nSkill points: {self.skill_points}')
             if self.items.get(item) > 0:
                 self.items.update({item: self.items.get(item) - 1})
                 has_item = True
-                print(f'Used {item}')
+                print(f'Used {Fore.BLUE}{item}{Fore.WHITE}')
         elif self.keys.__contains__(item):
             self.keys.remove(item)
             has_item = True
-            print(f'Used {item}')
+            print(f'Used {Fore.BLUE}{item}{Fore.WHITE}')
         if not has_item:
-            print(f'You don\'t have {item}')
+            print(f'You don\'t have {Fore.BLUE}{item}{Fore.WHITE}')
         return has_item
 
     def small_potion(self):
@@ -279,9 +280,10 @@ exp to level up\nSkill points: {self.skill_points}')
         """
         lists commands that player can use always
         """
-        print('stats - to check your attributes\ngold - to check your gold\nitems - check your items\n\
-level - check your level and exp\nsmall potion - to use potion if you have it\n\
-big potion - to use potion if you have it')
+        print(f'{Fore.CYAN}stats{Fore.WHITE} - to check your attributes\n{Fore.CYAN}gold{Fore.WHITE} - to check your \
+gold\n{Fore.CYAN}items{Fore.WHITE} - check your items\n{Fore.CYAN}level{Fore.WHITE} - check your level and exp \n\
+{Fore.CYAN}upgrade{Fore.WHITE} - to upgrade on of yours attributes\n{Fore.CYAN}small potion{Fore.WHITE} - \
+to use potion if you have it\n{Fore.CYAN}big potion{Fore.WHITE} - to use potion if you have it')
 
 
 class Knight(Player):
@@ -343,8 +345,9 @@ class Knight(Player):
 
     @staticmethod
     def battle_help_command():
-        print('normal attack <enemy id>- attacks chosen enemy with basic attack\n\
-heavy attack - attacks chosen enemy with powerful heavy attack, but with lower speed and small chance to miss')
+        print(f'{Fore.CYAN}normal{Fore.WHITE} <enemy id>- attacks chosen enemy with basic attack\n\
+{Fore.CYAN}heavy{Fore.WHITE} - attacks chosen enemy with powerful heavy attack, but with lower speed and small\
+ chance to miss')
 
 
 class Wizard(Player):
@@ -420,8 +423,8 @@ class Wizard(Player):
 
     @staticmethod
     def battle_help_command():
-        print('magic attack <enemy id>- attacks chosen enemy with magic attack\n\
-aoe - attacks every enemies in the battle')
+        print(f'{Fore.CYAN}magic{Fore.WHITE} <enemy id>- attacks chosen enemy with magic attack\n\
+{Fore.CYAN}aoe{Fore.WHITE} - attacks every enemies in the battle')
 
 
 class Rouge(Player):
@@ -484,5 +487,5 @@ class Rouge(Player):
 
     @staticmethod
     def battle_help_command():
-        print('fast attack <enemy id>- attacks chosen enemy with quick attack\n\
-life steal <enemy id> - attack chosen enemy and steals small amount of his hp healing player')
+        print(f'{Fore.CYAN}fast{Fore.WHITE} <enemy id>- attacks chosen enemy with quick attack\n\
+{Fore.CYAN}life steal{Fore.WHITE} <enemy id> - attack chosen enemy and steals small amount of his hp healing player')

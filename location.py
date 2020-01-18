@@ -1,3 +1,6 @@
+from colorama import Fore
+
+
 class Location:
     """
     This class defines basic properties and methods of a location
@@ -87,7 +90,7 @@ class Location:
 
     @staticmethod
     def help_command():
-        print('look around - to find all possible directions you can go to')
+        print(f'{Fore.CYAN}look around{Fore.WHITE} - to find all possible directions you can go to')
 
     def __str__(self):
         return self.description

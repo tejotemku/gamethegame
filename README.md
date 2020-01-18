@@ -12,4 +12,4 @@ Game is started by game.py file
 
 ## Author
 
-* **Filip Drygaś**
+**Filip Drygaś**

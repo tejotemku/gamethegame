@@ -1,5 +1,7 @@
 from location import Location, BattleLocation
 from battle import Battle
+from colorama import Fore
+
 
 class Map:
     """
@@ -55,16 +57,17 @@ class Map:
                 if self.locations[loc.get('id')].key:
                     if self.player.remove_item(self.locations[loc.get('id')].key):
                         self.locations[loc.get('id')].open_location()
-                        print(f"You have opened: {self.locations[loc.get('id')].name}")
+                        print(f"You have opened: {Fore.YELLOW}{self.locations[loc.get('id')].name}{Fore.WHITE}")
                         self.move_to_different_location(loc.get('id'))
                         return
                     else:
-                        print(f'You need {self.locations[loc.get("id")].key} to open this location')
+                        print(f'You need {Fore.BLUE}{self.locations[loc.get("id")].key}{Fore.WHITE} to open \
+this location')
                         return
                 else:
                     self.move_to_different_location(loc.get('id'))
                     return
-        print('Invalid Command')
+        print(f'{Fore.RED}Invalid Command{Fore.WHITE}')
 
     def move_to_different_location(self, location_id: int):
         """
@@ -72,8 +75,9 @@ class Map:
         :param location_id: locations player are moving into
         """
         self._current_location = self.locations[location_id]
-        print(f'You have entered: {self.current_location.name}')
-        print(self.current_location.description)
+        print(f'You have entered: {Fore.YELLOW}{self.current_location.name}{Fore.WHITE}')
+        print(Fore.LIGHTYELLOW_EX + self.current_location.description + Fore.WHITE)
+        self.current_location.get_locations()
         if type(self.current_location) == BattleLocation:
             if self.current_location.enemies:
                 self.player.battle = Battle(self.current_location.enemies, self)

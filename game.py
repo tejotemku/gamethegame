@@ -2,6 +2,7 @@ from os import walk, getcwd
 from file_system import map_json_deserializer, map_json_serializer
 from player import Rouge, Wizard, Knight
 from shop import Shop
+from colorama import init, Fore
 
 
 class Game:
@@ -14,6 +15,7 @@ class Game:
         """
         self._map = None
         self._running = True
+        init()
 
     @property
     def map(self):
@@ -34,14 +36,14 @@ class Game:
         """
         This methods initiates all game mechanics, also listing items while in shop or enemies during battle
         """
-        print('Choose game save you want to play:')
+        print(Fore.WHITE + 'Choose game save you want to play:')
         for (dirpath, dirnames, filenames) in walk(getcwd()):
             for file in filenames:
                 if '.txt' == file[-4:]:
                     print(file[:-4])
             break
         while self.running:
-            self.general_command_handler(str(input()))
+            self.general_command_handler(self.get_input())
 
     def general_command_handler(self, command):
         """
@@ -89,9 +91,13 @@ class Game:
                 print('Choose your class: rouge, knight or wizard')
                 self.map.game_state = 'choose class'
             else:
-                print('Write command \'help\' to view commands you can use!')
+                print(f'You are in: {Fore.YELLOW}{self.map.current_location.name}{Fore.WHITE}')
+                print(Fore.LIGHTYELLOW_EX + self.map.current_location.description + Fore.WHITE)
+                self.map.current_location.get_locations()
+
+                print(f'Write command \'{Fore.CYAN}help{Fore.WHITE}\' to view commands you can use!')
         except FileNotFoundError:
-            print('Map file does not exist! Try again.')
+            print(f'{Fore.RED}Map file does not exist! Try again.{Fore.WHITE}')
 
     def save_game(self, game_save_name):
         """
@@ -119,11 +125,16 @@ class Game:
         for c in classes:
             if self.compare_commands(c, command):
                 print('Choose your name')
-                self.map.player = classes.get(c)(str(input()))
+                self.map.player = classes.get(c)(self.get_input())
                 self.map.game_state = 'explore'
-                print('Write command \'help\' to view commands you can use!')
+                print(f'You are in: {Fore.YELLOW}{self.map.current_location.name}{Fore.WHITE}')
+                print(Fore.LIGHTYELLOW_EX + self.map.current_location.description + Fore.WHITE)
+                self.map.current_location.get_locations()
+                print(f'Write command \'{Fore.CYAN}help{Fore.WHITE}\' to view commands you can use!')
                 return
-        print('Invalid Command')
+        print(f'{Fore.RED}Unknown class, please choose one of the following:{Fore.WHITE}')
+        for c in classes:
+            print(c)
 
     def exploring_actions(self, command):
         """
@@ -134,7 +145,7 @@ class Game:
         if command == 'search':
             self.map.player.new_items(self.map.current_location.find_hidden_items())
             return
-        elif command == 'level up':
+        elif command == 'upgrade':
             if self.map.player.skill_points > 0:
                 self.map.game_state = 'level up'
                 self.map.player.upgrade()
@@ -191,7 +202,7 @@ class Game:
                     else:
                         print('There is no enemy with that id')
         else:
-            print('Invalid Command')
+            print(f'{Fore.RED}Invalid Command{Fore.WHITE}')
 
     def level_up_actions(self, command):
         """
@@ -215,7 +226,7 @@ class Game:
             self.map.game_state = 'explore'
             return
 
-        print('Invalid Command')
+        print(f'{Fore.RED}Invalid Command{Fore.WHITE}')
 
     def shop_actions(self, command):
         """
@@ -237,7 +248,7 @@ class Game:
             self.map.game_state = 'explore'
             print('You have left the shop')
             return
-        print('Invalid Command')
+        print(f'{Fore.RED}Invalid Command{Fore.WHITE}')
 
     def help_command(self):
         self.map.player.help_command()
@@ -252,7 +263,7 @@ class Game:
             game_states.get(self.map.game_state)()
 
         if self.map.current_location.type == 'town':
-            print('save - to save the game\nshop - to go to town shop')
+            print(f'{Fore.CYAN}save{Fore.WHITE} - to save the game\n{Fore.CYAN}shop{Fore.WHITE} - to go to town shop')
 
     @staticmethod
     def compare_commands(str1: str, str2: str):
@@ -260,6 +271,18 @@ class Game:
         :return: compares two strings by checking if one contains the other
         """
         return str1.lower() in str2.lower() or str2.lower() in str1.lower()
+
+    @staticmethod
+    def get_input():
+        print(Fore.GREEN)
+        loop = True
+        string = ''
+        while loop:
+            string = str(input())
+            if string.strip():
+                loop = False
+        print(Fore.WHITE)
+        return string
 
 
 game = Game()

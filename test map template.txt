@@ -6,7 +6,7 @@
         "id": 0,
         "name": "Grobla",
         "type": "town",
-        "description": "This is a town called Grobla",
+        "description": "This is a small creek town called Grobla",
         "locations": [
              {
              "id": 1,
@@ -23,7 +23,7 @@
         "id": 1,
         "name": "King's Road",
         "type": "vanilla",
-        "description": "This is King's road",
+        "description": "This is King's road used by a lot of travellers, mercenaries and merchants",
         "locations": [
             {
             "id": 0,
@@ -40,7 +40,7 @@
         "id": 2,
         "name": "Old Road",
         "type": "battle",
-        "description": "This is an Old Road",
+        "description": "This is an Old Road. It is forgotten by most, but not thieves that maraud everyone that wishes to pass it",
         "locations": [
             {
             "id": 0,
@@ -54,13 +54,13 @@
         "id": 3,
         "name": "Forest",
         "type": "vanilla",
-        "description": "This is a dark forrest",
+        "description": "This is a dark forest. Some say you can find interesting items here",
         "locations": [
             {
             "id": 1,
             "direction": "Leave forest"
             }],
-        "hidden items": [],
+        "hidden items": ["big potion", "big potion", "small potion"],
         "key": "rusty key"
         }]
 
