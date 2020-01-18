@@ -113,7 +113,8 @@ this location')
                 self.player.reset_magic_barrier()
         else:
             self.game_state = 'game_over'
-            print('Game Over!')
+            print('Game Over! Good luck next time')
+
         pass
 
     @staticmethod

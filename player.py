@@ -8,36 +8,35 @@ class Player:
     """
     This is a class of a player
     """
-    def __init__(self, name: str, hp_max: int, hp: int, speed: int, power: int, character_class: str,
-                 exp: int = 0, lvl: int = 0, skill_points: int = 0, gold: int = 0, items=None, keys=None):
+    def __init__(self, character):
         """
         This method initiates a player object
         """
         # basic info
-        self._name = name
-        self._class = character_class
+        self._name = character.get('name')
+        self._class = character.get('class')
         self._battle = None
         # exp and gold
-        self._experience = exp
-        self._lvl = lvl
-        self._skill_points = skill_points
-        self._gold = gold
+        self._experience = character.get('exp')
+        self._lvl = character.get('level')
+        self._skill_points = character.get('skill points')
+        self._gold = character.get('gold')
         # basic stats
-        self._power = power
-        self._speed = speed
-        self._hp = hp
-        self._hp_max = hp_max
+        self._power = character.get('power')
+        self._speed = character.get('speed')
+        self._hp = character.get('hp')
+        self._hp_max = character.get('hp max')
         # locations keys
         self._keys = []
-        if keys:
-            self._keys.extend(keys)
+        if character.get('keys'):
+            self._keys.extend(character.get('keys'))
         # items
         self._list_of_items = {}
         for i in Shop().items.keys():
             self.items.update({i: 0})
-        if items:
-            for key in items:
-                self.items.update({key: items.get(key)})
+        if character.get('items'):
+            for key in character.get('items'):
+                self.items.update({key: character.get('items').get(key)})
 
     @property
     def name(self):
@@ -285,22 +284,36 @@ gold\n{Fore.CYAN}items{Fore.WHITE} - check your items\n{Fore.CYAN}level{Fore.WHI
 {Fore.CYAN}upgrade{Fore.WHITE} - to upgrade on of yours attributes\n{Fore.CYAN}small potion{Fore.WHITE} - \
 to use potion if you have it\n{Fore.CYAN}big potion{Fore.WHITE} - to use potion if you have it')
 
+    def get_dict(self):
+        return {
+            'name': self.name,
+            'class': self.character_class,
+            'level': self.level,
+            'skill points': self.skill_points,
+            'exp': self.exp,
+            'gold': self.gold,
+            'hp max': self.hp_max,
+            'hp': self.hp,
+            'power': self.power,
+            'speed': self.speed,
+            'items': self.items,
+            'keys': self.keys
+        }
+
 
 class Knight(Player):
     """
     This is a subclass of a player that is a class of player's character class Knight
     """
 
-    def __init__(self, name: str, hp_max: int = 40, hp: int = 40, speed: int = 5, power: int = 8,
-                 ch_class: str = 'knight', exp: int = 0, lvl: int = 1, skill_points: int = 0,
-                 gold: int = 0, items=None, keys=None):
+    def __init__(self, character):
         """
         This method creates object of Knight
         """
-        super().__init__(name=name, hp_max=hp_max, hp=hp, speed=speed, power=power, character_class=ch_class, exp=exp,
-                         lvl=lvl, skill_points=skill_points, gold=gold, items=items, keys=keys)
+        super().__init__(character=character)
         # heavy armor of a knight reduces damage
         self.dmg_reduction = 2
+        self._class = 'knight'
 
     def hp_increase(self):
         self._hp += 5
@@ -321,19 +334,25 @@ class Knight(Player):
         :param enemy_id: targeted enemy
         """
         self.battle.round(self.battle.list_of_enemies[int(enemy_id) - 1],
-                          Player(self.name, 10, 10, self.speed, self.power, 'attack avatar'))
+                          Player(self.get_dict()))
 
     def heavy_attack(self, enemy_id):
         """
         This is a method of knight's heavy attack
         :param enemy_id: targeted enemy
         """
+        player_dict = self.get_dict()
+        player_dict.update({
+            'power': int(self.power*1.5),
+            'speed': int(self.speed) - 1
+        })
+
         if random.randint(0, 101) <= 85:
             self.battle.round(self.battle.list_of_enemies[int(enemy_id) - 1],
-                              Player(self.name, 10, 10, self.speed - 1, int(self.power*1.5), 'attack avatar'))
+                              Player(player_dict))
         else:
             print('You have missed the enemy')
-            self.battle.round([], Player(self.name, 10, 10, self.speed, int(self.power*1.2), 'attack avatar'))
+            self.battle.round([], Player(player_dict))
 
     def take_dmg(self, dmg: int):
         """
@@ -354,20 +373,18 @@ class Wizard(Player):
     """
     This is a subclass of a player that is a class of player's character class Knight
     """
-    def __init__(self, name: str, hp_max: int = 18, hp: int = 18, speed: int = 7, power: int = 5,
-                 ch_class: str = 'wizard', exp: int = 0, lvl: int = 1, skill_points: int = 0,
-                 gold: int = 0, items=None, keys=None, magic_barrier: int = 4):
-        super().__init__(name=name, hp_max=hp_max, hp=hp, speed=speed, power=power, character_class=ch_class, exp=exp,
-                         lvl=lvl, skill_points=skill_points, gold=gold, items=items, keys=keys)
-        self._magic_barrier = magic_barrier
-        self._magic_barrier_max = magic_barrier
+    def __init__(self, character):
+        super().__init__(character=character)
+        self._magic_barrier = character.get('magic barrier')
+        self._magic_barrier_max = character.get('magic barrier')
+        self._class = 'wizard'
 
     def get_stats(self):
         """
         :return: player's current stats
         """
         super().get_stats()
-        print(f'magic_barrier: {self._magic_barrier}')
+        print(f'magic barrier: {self._magic_barrier}')
 
     @property
     def magic_barrier(self):
@@ -389,20 +406,31 @@ class Wizard(Player):
         """
         This is a method of wizard's aoe attack
         """
-        self.battle.round(self.battle.list_of_enemies, Player(self.name, 10, 10, self.speed, int(self.power*0.55),
-                                                              'attack avatar'))
+
+        player_dict = self.get_dict()
+        player_dict.update({
+            'power': int(self.power * 0.55)
+        })
+
+        self.battle.round(self.battle.list_of_enemies, Player(player_dict))
 
     def magic_attack(self, enemy_id):
         """
         This is a method of wizard's heavy attack
         :param enemy_id: targeted enemy
         """
+
+        player_dict = self.get_dict()
+        player_dict.update({
+            'power': int(self.power * 1.2)
+        })
+
         if random.randint(0, 101) <= 90:
             self.battle.round(self.battle.list_of_enemies[int(enemy_id) - 1],
-                              Player(self.name, 10, 10, self.speed, int(self.power*1.2), 'attack avatar'))
+                              Player(player_dict))
         else:
             print('You have missed the enemy')
-            self.battle.round([], Player(self.name, 10, 10, self.speed, int(self.power*1.2), 'attack avatar'))
+            self.battle.round([], Player(self.get_dict()))
 
     def take_dmg(self, dmg: int):
         """
@@ -426,17 +454,20 @@ class Wizard(Player):
         print(f'{Fore.CYAN}magic{Fore.WHITE} <enemy id>- attacks chosen enemy with magic attack\n\
 {Fore.CYAN}aoe{Fore.WHITE} - attacks every enemies in the battle')
 
+    def get_dict(self):
+        player_dict = super().get_dict()
+        player_dict.update({'magic barrier': self.magic_barrier})
+        return player_dict
+
 
 class Rouge(Player):
     """
     This is a subclass of a player that is a class of player's character class Rouge
     """
-    def __init__(self, name: str, hp_max: int = 20, hp: int = 20, speed: int = 7, power: int = 11,
-                 ch_class: str = 'rouge', exp: int = 0, lvl: int = 1, skill_points: int = 0,
-                 gold: int = 0, items=None, keys=None, agility: int = 20):
-        super().__init__(name=name, hp_max=hp_max, hp=hp, speed=speed, power=power, character_class=ch_class, exp=exp,
-                         lvl=lvl, skill_points=skill_points, gold=gold, items=items, keys=keys)
-        self._agility = agility
+    def __init__(self, character):
+        super().__init__(character=character)
+        self._agility = character.get('agility')
+        self._class = 'rouge'
 
     def get_stats(self):
         """
@@ -463,8 +494,16 @@ class Rouge(Player):
         This is a method of rouge's life stealing attack, that damages enemy but also heals player
         :param enemy_id: targeted enemy
         """
+        player_dict = self.get_dict()
+        player_dict.update({
+            'speed': self.speed + self.agility // 10,
+            'power': self.power//2
+        })
         self.battle.round(self.battle.list_of_enemies[int(enemy_id) - 1],
-                          Player(self.name, 10, 10, self.speed + self.agility // 10, self.power//2, 'attack avatar'))
+                          Player(player_dict))
+
+        self.battle.round(self.battle.list_of_enemies[int(enemy_id) - 1],
+                          Player(player_dict))
         self.heal(self.power//4)
 
     def fast_attack(self, enemy_id):
@@ -472,8 +511,10 @@ class Rouge(Player):
         This is a method of rouge's fast attack
         :param enemy_id: targeted enemy
         """
+        player_dict = self.get_dict()
+        player_dict.update({'speed': self.speed + self.agility // 10})
         self.battle.round(self.battle.list_of_enemies[int(enemy_id) - 1],
-                          Player(self.name, 10, 10, self.speed + self.agility // 10, self.power, 'attack avatar'))
+                          Player(player_dict))
 
     def take_dmg(self, dmg: int):
         """
@@ -489,3 +530,8 @@ class Rouge(Player):
     def battle_help_command():
         print(f'{Fore.CYAN}fast{Fore.WHITE} <enemy id>- attacks chosen enemy with quick attack\n\
 {Fore.CYAN}life steal{Fore.WHITE} <enemy id> - attack chosen enemy and steals small amount of his hp healing player')
+
+    def get_dict(self):
+        player_dict = super().get_dict()
+        player_dict.update({'agility': self.agility})
+        return player_dict

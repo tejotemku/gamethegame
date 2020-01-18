@@ -5,28 +5,21 @@ class Location:
     """
     This class defines basic properties and methods of a location
     """
-    def __init__(self, loc_id, loc_name, loc_description, locations, hidden_items=None,
-                 key=None):
+    def __init__(self, loc):
         """
         This initiates a location object
-        :param loc_id: id number
-        :param loc_name: name
-        :param loc_description: description
-        :param locations: nearby locations that you can go to
-        :param hidden_items: items hidden in this place
-        :param key: key needed to enter this area
         """
-        self._id = loc_id
+        self._id = loc.get('id')
         self._type = 'vanilla'
-        self._name = loc_name
-        self._description = loc_description
+        self._name = loc.get('name')
+        self._description = loc.get('description')
         self._nearby_locations = []
-        if locations:
-            self._nearby_locations.extend(locations)
+        if loc.get('locations'):
+            self._nearby_locations.extend(loc.get('locations'))
         self._hidden_items = []
-        if hidden_items:
-            self._hidden_items.extend(hidden_items)
-        self._key = key
+        if loc.get('hidden items'):
+            self._hidden_items.extend(loc.get('hidden items'))
+        self._key = loc.get('key')
 
     @property
     def id(self):
@@ -95,12 +88,21 @@ class Location:
     def __str__(self):
         return self.description
 
+    def get_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'type': self.type,
+            'description': self.description,
+            'locations': self.nearby_locations,
+            'hidden items': self.hidden_items,
+            'key': self.key
+        }
+
 
 class Town(Location):
-    def __init__(self, loc_id, loc_name, loc_description, locations, hidden_items=None,
-                 key=None):
-        super().__init__(loc_id, loc_name, loc_description, locations, hidden_items,
-                         key)
+    def __init__(self, loc):
+        super().__init__(loc=loc)
         self._type = 'town'
 
     def get_locations(self):
@@ -109,11 +111,9 @@ class Town(Location):
 
 
 class BattleLocation(Location):
-    def __init__(self, loc_id, loc_name, loc_description, locations, enemies, hidden_items=None,
-                 key=None):
-        super().__init__(loc_id, loc_name, loc_description, locations, hidden_items,
-                         key)
-        self._enemies = enemies
+    def __init__(self, loc):
+        super().__init__(loc=loc)
+        self._enemies = loc.get('enemies')
         self._type = 'battle'
 
     @property
@@ -123,3 +123,10 @@ class BattleLocation(Location):
     @enemies.setter
     def enemies(self, value):
         self._enemies = value
+
+    def get_dict(self):
+        loc_dict = super().get_dict()
+        loc_dict.update({
+                'enemies': self.enemies
+            })
+        return loc_dict

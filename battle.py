@@ -1,6 +1,7 @@
 from enemy import Enemy, enemies
 import copy
 import random
+from colorama import Fore
 
 
 class Battle:
@@ -64,7 +65,7 @@ class Battle:
     def list_enemies(self):
         print(f'Round: {self.rounds}')
         for i, enemy in enumerate(self.list_of_enemies):
-            print(f'{i+1}: {enemy.name} - {enemy.hp} hp')
+            print(f'{i+1}: {Fore.LIGHTMAGENTA_EX}{enemy.name}{Fore.WHITE} - {enemy.hp} hp')
 
     def round(self, targets, players_avatar):
         """
@@ -87,7 +88,8 @@ class Battle:
 
         for attack in list_of_attacks_this_round:
             if attack[0].check_if_alive() and attack[1].check_if_alive():
-                print(f'{attack[1].name} attack {attack[0].name} for {attack[1].power} damage')
+                print(f'{Fore.LIGHTGREEN_EX}{attack[1].name}{Fore.WHITE} attack {Fore.LIGHTRED_EX}{attack[0].name}\
+{Fore.WHITE} for {attack[1].power} damage')
                 attack[0].take_dmg(attack[1].power)
 
         for enemy in self.list_of_enemies:

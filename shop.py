@@ -1,3 +1,6 @@
+from colorama import Fore
+
+
 class Shop:
     """
     This is a class of town shop
@@ -14,10 +17,10 @@ class Shop:
 
     @staticmethod
     def leave_shop():
-        print('leave - to leave the shop')
+        print(f'Use command \'{Fore.CYAN}leave{Fore.WHITE}\' to leave the shop')
 
     def __str__(self):
         string = ""
         for i in self.items:
             string += f'{i}: {self.items.get(i)}\n'
-        return string[:-2]
+        return string[:-1]

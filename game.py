@@ -43,6 +43,10 @@ class Game:
                     print(file[:-4])
             break
         while self.running:
+            if self.map:
+                if self.map.game_state == 'game_over':
+                    self.running = False
+                    return
             self.general_command_handler(self.get_input())
 
     def general_command_handler(self, command):
@@ -62,6 +66,10 @@ class Game:
             }
             commands.update(self.map.player.basic_commands())
             commands.update(self.map.current_location.basic_commands())
+
+            if self.map.game_state == 'merchant':
+                commands.pop("small potion")
+                commands.pop("big potion")
 
             if command in commands:
                 commands.get(command)()
@@ -116,16 +124,50 @@ class Game:
         Command handler when user chooses class for a new player, also asks user for a name
         :param command: inputted command
         """
+        player_dict = {
+            'exp': 0,
+            'level': 1,
+            'skill points': 0,
+            'gold': 0,
+            'keys': [],
+            'items': {}
+        }
+
         classes = {
-            'knight': Knight,
-            'wizard': Wizard,
-            'rouge': Rouge
+            'knight': (
+                Knight,
+                {
+                    'hp': 40,
+                    'hp max': 40,
+                    'speed': 5,
+                    'power': 8
+                }),
+            'wizard': (
+                Wizard,
+                {
+                    'hp': 18,
+                    'hp max': 18,
+                    'speed': 7,
+                    'power': 8,
+                    'magic barrier': 4
+                }),
+            'rouge': (
+                Rouge,
+                {
+                    'hp': 20,
+                    'hp max': 20,
+                    'speed': 7,
+                    'power': 11,
+                    'agility': 20
+                })
         }
 
         for c in classes:
             if self.compare_commands(c, command):
                 print('Choose your name')
-                self.map.player = classes.get(c)(self.get_input())
+                player_dict.update({'name': self.get_input()})
+                player_dict.update(classes.get(c)[1])
+                self.map.player = classes.get(c)[0](player_dict)
                 self.map.game_state = 'explore'
                 print(f'You are in: {Fore.YELLOW}{self.map.current_location.name}{Fore.WHITE}')
                 print(Fore.LIGHTYELLOW_EX + self.map.current_location.description + Fore.WHITE)
@@ -156,6 +198,9 @@ class Game:
         elif self.map.current_location.type == 'town':
             if self.compare_commands('shop', command):
                 self.map.game_state = 'merchant'
+                shop = Shop()
+                shop.leave_shop()
+                print(shop)
                 return
             elif self.compare_commands('save', command):
                 self.map.game_state = 'saving'
@@ -255,8 +300,7 @@ class Game:
         self.map.current_location.help_command()
 
         game_states = {
-            'battle': self.map.player.battle_help_command,
-            'merchant': Shop.leave_shop
+            'battle': self.map.player.battle_help_command
         }
 
         if self.map.game_state in game_states:
