@@ -107,7 +107,7 @@ class Town(Location):
 
     def get_locations(self):
         super().get_locations()
-        print('Go to town shop')
+        print('shop')
 
 
 class BattleLocation(Location):

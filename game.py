@@ -331,6 +331,3 @@ class Game:
 
 game = Game()
 game.game_loop()
-
-# todo help and attributes listing and correct saving file so it replaces previous content
-# todo notification box commands on actions
