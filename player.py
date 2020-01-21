@@ -8,6 +8,7 @@ class Player:
     """
     This is a class of a player
     """
+
     def __init__(self, character):
         """
         This method initiates a player object
@@ -74,7 +75,8 @@ class Player:
         return self.level_up()
 
     def get_level(self):
-        print(f'Level: {self.level}\nExp: {self.exp}\nYou need {int(10*pow(1.2, self.level))-self.exp} \
+        print(f'Level: {self.level}\nExp: {self.exp}\n\
+You need {int(10*pow(1.2, self.level))-self.exp} \
 exp to level up\nSkill points: {self.skill_points}')
 
     @property
@@ -92,7 +94,9 @@ exp to level up\nSkill points: {self.skill_points}')
             self._lvl += 1
             self._experience -= exp_to_level_up
             self.add_skill_point()
-            print(f'You have leveled up! \nYou are currently on level {self.level}!')
+            print(
+                f'You have leveled up! \nYou are currently on \
+level {self.level}!')
         return lvl_up
 
     @staticmethod
@@ -108,7 +112,8 @@ exp to level up\nSkill points: {self.skill_points}')
 
     def add_skill_point(self):
         self._skill_points += 1
-        print(f'You have got a skill point and now you have {self.skill_points}')
+        print(
+            f'You have got a skill point and now you have {self.skill_points}')
 
     # gold methods
 
@@ -146,7 +151,9 @@ exp to level up\nSkill points: {self.skill_points}')
         """
         :return: player's current stats
         """
-        print(f'power: {self.power}\nspeed: {self.speed}\nhp: {self.hp}\nhp max: {self.hp_max}')
+        print(
+            f'power: {self.power}\nspeed: {self.speed}\nhp: {self.hp}\n\
+hp max: {self.hp_max}')
 
     @property
     def power(self):
@@ -279,10 +286,13 @@ exp to level up\nSkill points: {self.skill_points}')
         """
         lists commands that player can use always
         """
-        print(f'{Fore.CYAN}stats{Fore.WHITE} - to check your attributes\n{Fore.CYAN}gold{Fore.WHITE} - to check your \
-gold\n{Fore.CYAN}items{Fore.WHITE} - check your items\n{Fore.CYAN}level{Fore.WHITE} - check your level and exp \n\
-{Fore.CYAN}upgrade{Fore.WHITE} - to upgrade on of yours attributes\n{Fore.CYAN}small potion{Fore.WHITE} - \
-to use potion if you have it\n{Fore.CYAN}big potion{Fore.WHITE} - to use potion if you have it')
+        print(f'{Fore.CYAN}stats{Fore.WHITE} - to check your attributes\n\
+{Fore.CYAN}gold{Fore.WHITE} - to check your gold\n\
+{Fore.CYAN}items{Fore.WHITE} - check your items\n\
+{Fore.CYAN}level{Fore.WHITE} - check your level and exp \n\
+{Fore.CYAN}upgrade{Fore.WHITE} - to upgrade on of yours attributes\n\
+{Fore.CYAN}small potion{Fore.WHITE} - to use potion if you have it\n\
+{Fore.CYAN}big potion{Fore.WHITE} - to use potion if you have it')
 
     def get_dict(self):
         return {
@@ -303,7 +313,7 @@ to use potion if you have it\n{Fore.CYAN}big potion{Fore.WHITE} - to use potion 
 
 class Knight(Player):
     """
-    This is a subclass of a player that is a class of player's character class Knight
+    This is a subclass of a player - Knight
     """
 
     def __init__(self, character):
@@ -356,7 +366,8 @@ class Knight(Player):
 
     def take_dmg(self, dmg: int):
         """
-        Damages player by given damage, which is reduced by knight's damage reduction attribute
+        Damages player by given damage, which is reduced by knight's damage \
+reduction attribute
         :param dmg: damage that knight is hit with
         """
         print(f'Your heavy armor reduces {self.dmg_reduction} points of dmg')
@@ -364,15 +375,18 @@ class Knight(Player):
 
     @staticmethod
     def battle_help_command():
-        print(f'{Fore.CYAN}normal{Fore.WHITE} <enemy id>- attacks chosen enemy with basic attack\n\
-{Fore.CYAN}heavy{Fore.WHITE} - attacks chosen enemy with powerful heavy attack, but with lower speed and small\
+        print(f'{Fore.CYAN}normal{Fore.WHITE} <enemy id>- attacks chosen enemy \
+with basic attack\n\
+{Fore.CYAN}heavy{Fore.WHITE} - attacks chosen enemy with powerful heavy \
+attack, but with lower speed and small\
  chance to miss')
 
 
 class Wizard(Player):
     """
-    This is a subclass of a player that is a class of player's character class Knight
+    This is a subclass of a player - Wizard
     """
+
     def __init__(self, character):
         super().__init__(character=character)
         self._magic_barrier = character.get('magic barrier')
@@ -434,7 +448,8 @@ class Wizard(Player):
 
     def take_dmg(self, dmg: int):
         """
-        Damages wizard's magic barrier and if it breaks it damages players health
+        Damages wizard's magic barrier and if it breaks it damages players \
+health
         :param dmg: damage that wizard is hit with
         """
         if self.magic_barrier > 0:
@@ -451,7 +466,8 @@ class Wizard(Player):
 
     @staticmethod
     def battle_help_command():
-        print(f'{Fore.CYAN}magic{Fore.WHITE} <enemy id>- attacks chosen enemy with magic attack\n\
+        print(f'{Fore.CYAN}magic{Fore.WHITE} <enemy id>- attacks chosen enemy \
+with magic attack\n\
 {Fore.CYAN}aoe{Fore.WHITE} - attacks every enemies in the battle')
 
     def get_dict(self):
@@ -462,8 +478,9 @@ class Wizard(Player):
 
 class Rouge(Player):
     """
-    This is a subclass of a player that is a class of player's character class Rouge
+    This is a subclass of a player - Rouge
     """
+
     def __init__(self, character):
         super().__init__(character=character)
         self._agility = character.get('agility')
@@ -491,7 +508,8 @@ class Rouge(Player):
 
     def life_stealing_blade_attack(self, enemy_id):
         """
-        This is a method of rouge's life stealing attack, that damages enemy but also heals player
+        This is a method of rouge's life stealing attack, that damages enemy \
+but also heals player
         :param enemy_id: targeted enemy
         """
         player_dict = self.get_dict()
@@ -528,8 +546,10 @@ class Rouge(Player):
 
     @staticmethod
     def battle_help_command():
-        print(f'{Fore.CYAN}fast{Fore.WHITE} <enemy id>- attacks chosen enemy with quick attack\n\
-{Fore.CYAN}life steal{Fore.WHITE} <enemy id> - attack chosen enemy and steals small amount of his hp healing player')
+        print(f'{Fore.CYAN}fast{Fore.WHITE} <enemy id>- attacks chosen enemy \
+with quick attack\n\
+{Fore.CYAN}life steal{Fore.WHITE} <enemy id> - attack chosen enemy and steals \
+small amount of his hp healing player')
 
     def get_dict(self):
         player_dict = super().get_dict()

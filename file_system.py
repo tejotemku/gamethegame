@@ -4,7 +4,7 @@ from player import Rouge, Wizard, Knight
 from location import Location, BattleLocation, Town
 
 
-def map_json_serializer(o: Map):
+def map_json_serializer(o):
     """
     Serializes map object to json so it can be saved
     :param o: map object

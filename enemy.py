@@ -2,7 +2,7 @@ class Enemy:
     """
     This class represents basic template of an enemy
     """
-    def __init__(self, name: str, power: int, speed: int, hp: int, exp: int, gold: int):
+    def __init__(self, name, power, speed, hp, exp, gold):
         """
         Initializes enemy object
         :param name: enemy's name

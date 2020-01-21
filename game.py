@@ -9,6 +9,7 @@ class Game:
     """
     This class defines a game
     """
+
     def __init__(self):
         """
         initiates game
@@ -34,7 +35,8 @@ class Game:
 
     def game_loop(self):
         """
-        This methods initiates all game mechanics, also listing items while in shop or enemies during battle
+        This methods initiates all game mechanics, also listing items while in\
+             shop or enemies during battle
         """
         print(Fore.WHITE + 'Choose game save you want to play:')
         for (dirpath, dirnames, filenames) in walk(getcwd()):
@@ -51,7 +53,8 @@ class Game:
 
     def general_command_handler(self, command):
         """
-        This is general command handler that sends command to more specific handlers depending on game state
+        This is general command handler that sends command to more specific \
+            handlers depending on game state
         :param command: inputted command
         """
 
@@ -99,11 +102,14 @@ class Game:
                 print('Choose your class: rouge, knight or wizard')
                 self.map.game_state = 'choose class'
             else:
-                print(f'You are in: {Fore.YELLOW}{self.map.current_location.name}{Fore.WHITE}')
-                print(Fore.LIGHTYELLOW_EX + self.map.current_location.description + Fore.WHITE)
+                print(f'You are in: {Fore.YELLOW}\
+{self.map.current_location.name}{Fore.WHITE}')
+                print(Fore.LIGHTYELLOW_EX +
+                      self.map.current_location.description + Fore.WHITE)
                 self.map.current_location.get_locations()
 
-                print(f'Write command \'{Fore.CYAN}help{Fore.WHITE}\' to view commands you can use!')
+                print(f'Write command \'{Fore.CYAN}help{Fore.WHITE}\' \
+to view commands you can use!')
         except FileNotFoundError:
             print(f'{Fore.RED}Map file does not exist! Try again.{Fore.WHITE}')
 
@@ -121,7 +127,8 @@ class Game:
 
     def choose_class(self, command):
         """
-        Command handler when user chooses class for a new player, also asks user for a name
+        Command handler when user chooses class for a new player, also asks\
+user for a name
         :param command: inputted command
         """
         player_dict = {
@@ -169,12 +176,19 @@ class Game:
                 player_dict.update(classes.get(c)[1])
                 self.map.player = classes.get(c)[0](player_dict)
                 self.map.game_state = 'explore'
-                print(f'You are in: {Fore.YELLOW}{self.map.current_location.name}{Fore.WHITE}')
-                print(Fore.LIGHTYELLOW_EX + self.map.current_location.description + Fore.WHITE)
+                print(
+                    f'You are in: {Fore.YELLOW}{self.map.current_location.name}\
+{Fore.WHITE}')
+                print(Fore.LIGHTYELLOW_EX +
+                      self.map.current_location.description + Fore.WHITE)
                 self.map.current_location.get_locations()
-                print(f'Write command \'{Fore.CYAN}help{Fore.WHITE}\' to view commands you can use!')
+                print(
+                    f'Write command \'{Fore.CYAN}help{Fore.WHITE}\' to view \
+commands you can use!')
                 return
-        print(f'{Fore.RED}Unknown class, please choose one of the following:{Fore.WHITE}')
+        print(
+            f'{Fore.RED}Unknown class, please choose one of the following:\
+{Fore.WHITE}')
         for c in classes:
             print(c)
 
@@ -185,7 +199,8 @@ class Game:
         """
 
         if command == 'search':
-            self.map.player.new_items(self.map.current_location.find_hidden_items())
+            self.map.player.new_items(
+                self.map.current_location.find_hidden_items())
             return
         elif command == 'upgrade':
             if self.map.player.skill_points > 0:
@@ -229,19 +244,21 @@ class Game:
                     actions = {
                         'normal': self.map.player.normal_attack,
                         'heavy':  self.map.player.heavy_attack
-                        }
+                    }
                 elif player_class == 'wizard':
                     actions = {
                         'magic': self.map.player.magic_attack
-                        }
+                    }
                 elif player_class == 'rouge':
                     actions = {
-                        'life steal': self.map.player.life_stealing_blade_attack,
+                        'life steal':
+                        self.map.player.life_stealing_blade_attack,
                         'fast':  self.map.player.fast_attack
-                        }
+                    }
 
                 if attack in actions:
-                    if int(enemy) <= len(self.map.player.battle.list_of_enemies):
+                    if int(enemy) <= len(
+                                    self.map.player.battle.list_of_enemies):
                         actions.get(attack)(enemy)
                         return
                     else:
@@ -307,7 +324,9 @@ class Game:
             game_states.get(self.map.game_state)()
 
         if self.map.current_location.type == 'town':
-            print(f'{Fore.CYAN}save{Fore.WHITE} - to save the game\n{Fore.CYAN}shop{Fore.WHITE} - to go to town shop')
+            print(
+                f'{Fore.CYAN}save{Fore.WHITE} - to save the game\n\
+{Fore.CYAN}shop{Fore.WHITE} - to go to town shop')
 
     @staticmethod
     def compare_commands(str1: str, str2: str):

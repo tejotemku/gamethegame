@@ -5,6 +5,7 @@ class Shop:
     """
     This is a class of town shop
     """
+
     def __init__(self):
         """
         This method initiates a shop object
@@ -17,7 +18,8 @@ class Shop:
 
     @staticmethod
     def leave_shop():
-        print(f'Use command \'{Fore.CYAN}leave{Fore.WHITE}\' to leave the shop')
+        print(
+            f'Use command \'{Fore.CYAN}leave{Fore.WHITE}\' to leave the shop')
 
     def __str__(self):
         string = ""

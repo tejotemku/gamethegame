@@ -65,13 +65,15 @@ class Battle:
     def list_enemies(self):
         print(f'Round: {self.rounds}')
         for i, enemy in enumerate(self.list_of_enemies):
-            print(f'{i+1}: {Fore.LIGHTMAGENTA_EX}{enemy.name}{Fore.WHITE} - {enemy.hp} hp')
+            print(f'{i+1}: {Fore.LIGHTMAGENTA_EX}{enemy.name}{Fore.WHITE} - \
+                {enemy.hp} hp')
 
     def round(self, targets, players_avatar):
         """
         This method manages attacks during round of a battle
         :param targets: list of enemies that player will hit
-        :param players_avatar: new temporary player instance that holds modified power and speed value
+        :param players_avatar: new temporary player instance that holds \
+            modified power and speed value
         """
         list_of_attacks_this_round = []
 
@@ -84,11 +86,13 @@ class Battle:
         for enemy in self._list_of_enemies:
             list_of_attacks_this_round.append((self.player, enemy))
 
-        list_of_attacks_this_round = self.set_priority_of_attacks(list_of_attacks_this_round)
+        list_of_attacks_this_round = self.set_priority_of_attacks(
+            list_of_attacks_this_round)
 
         for attack in list_of_attacks_this_round:
             if attack[0].check_if_alive() and attack[1].check_if_alive():
-                print(f'{Fore.LIGHTGREEN_EX}{attack[1].name}{Fore.WHITE} attack {Fore.LIGHTRED_EX}{attack[0].name}\
+                print(f'{Fore.LIGHTGREEN_EX}{attack[1].name}{Fore.WHITE}\
+ attack {Fore.LIGHTRED_EX}{attack[0].name}\
 {Fore.WHITE} for {attack[1].power} damage')
                 attack[0].take_dmg(attack[1].power)
 
@@ -109,7 +113,8 @@ class Battle:
                 items.append('small potion')
             if 55 < ran < 65:
                 items.append('big potion')
-            self.game_map.end_battle(self.player.check_if_alive(), self.exp, self.gold, items)
+            self.game_map.end_battle(self.player.check_if_alive(), self.exp,
+                                     self.gold, items)
         else:
             self.list_enemies()
         self._rounds += 1

@@ -7,6 +7,7 @@ class Map:
     """
     This is a class of a game map
     """
+
     def __init__(self, locations, cur_loc, player=None):
         """
         This creates an instance of a map
@@ -55,9 +56,12 @@ class Map:
         for loc in self.current_location.nearby_locations:
             if self.compare_commands(loc.get('direction'), command):
                 if self.locations[loc.get('id')].key:
-                    if self.player.remove_item(self.locations[loc.get('id')].key):
+                    if self.player.remove_item(self.locations[loc.get('id')
+                                                              ].key):
                         self.locations[loc.get('id')].open_location()
-                        print(f"You have opened: {Fore.YELLOW}{self.locations[loc.get('id')].name}{Fore.WHITE}")
+                        print(
+                            f"You have opened: {Fore.YELLOW}\
+{self.locations[loc.get('id')].name}{Fore.WHITE}")
                         self.move_to_different_location(loc.get('id'))
                         return
                     else:
@@ -75,19 +79,24 @@ this location')
         :param location_id: locations player are moving into
         """
         self._current_location = self.locations[location_id]
-        print(f'You have entered: {Fore.YELLOW}{self.current_location.name}{Fore.WHITE}')
-        print(Fore.LIGHTYELLOW_EX + self.current_location.description + Fore.WHITE)
+        print(
+            f'You have entered: {Fore.YELLOW}{self.current_location.name}\
+{Fore.WHITE}')
+        print(Fore.LIGHTYELLOW_EX +
+              self.current_location.description + Fore.WHITE)
         self.current_location.get_locations()
         if type(self.current_location) == BattleLocation:
             if self.current_location.enemies:
-                self.player.battle = Battle(self.current_location.enemies, self)
+                self.player.battle = Battle(
+                    self.current_location.enemies, self)
                 self.game_state = 'battle'
 
     # battle methods
     def start_battle(self, list_of_enemies):
         """
         Starts a battle with enemies
-        :param list_of_enemies: array of Enemy objects that player will fight with during battle
+        :param list_of_enemies: array of Enemy objects that player will fight\
+             with during battle
         """
         self._player.battle = Battle(list_of_enemies, self)
         self.game_state = 'battle'
