@@ -23,4 +23,4 @@ def test_location():
     assert location.name == "Town"
 
 
-# My greatest test is my game tester Marcel Jarosz
+# My greatest test is my game tester tedtheripper
