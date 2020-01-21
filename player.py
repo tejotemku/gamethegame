@@ -335,7 +335,7 @@ class Knight(Player):
         """
         :return: player's current stats
         """
-        print(super().get_stats())
+        super().get_stats()
         print(f'dmg reduction: {self.dmg_reduction}')
 
     def normal_attack(self, enemy_id):

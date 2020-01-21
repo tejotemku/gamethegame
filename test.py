@@ -21,3 +21,6 @@ def test_location():
     location = Location(dict_location)
     assert location.id == 33
     assert location.name == "Town"
+
+
+# My greatest test is my game tester Marcel Jarosz
