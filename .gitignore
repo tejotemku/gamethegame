@@ -3,4 +3,6 @@ __pycache__
 /README-Template.md
 .vscode
 .pytest_cache
-.idea
+/.idea
+/.pytest_cache/
+/.vscode/

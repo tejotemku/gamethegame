@@ -315,7 +315,6 @@ commands you can use!')
     def help_command(self):
         """
         This method lists all available
-        :return:
         """
         self.map.player.help_command()
         self.map.current_location.help_command()
