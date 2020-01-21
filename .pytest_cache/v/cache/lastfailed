@@ -1,0 +1,8 @@
+{
+  "venv/Lib/site-packages/importlib_metadata/tests/test_api.py": true,
+  "venv/Lib/site-packages/importlib_metadata/tests/test_integration.py": true,
+  "venv/Lib/site-packages/importlib_metadata/tests/test_main.py": true,
+  "venv/Lib/site-packages/importlib_metadata/tests/test_zip.py": true,
+  "venv/Lib/site-packages/more_itertools/tests/test_more.py": true,
+  "venv/Lib/site-packages/more_itertools/tests/test_recipes.py": true
+}
